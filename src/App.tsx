@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { CountdownTimer } from './components/CountdownTimer';
 import { ValueDisplay } from './components/ValueDisplay';
+import { LivePrices } from './components/LivePrices';
+import { usePrices } from './hooks/usePrices';
 import DbrLogo from './assets/dbr-animation.svg';
 
 const AppContainer = styled.div`
@@ -34,13 +36,16 @@ const Logo = styled.img`
 `;
 
 function App() {
+  const { prices, loading, refetch } = usePrices();
+
   return (
     <AppContainer>
       <Logo src={DbrLogo} alt="deBridge Logo" />
       <Title>deBridge Foundation</Title>
       <Subtitle>Second Distribution Countdown</Subtitle>
       <CountdownTimer />
-      <ValueDisplay />
+      <ValueDisplay prices={prices} loading={loading} onRefresh={refetch} />
+      <LivePrices prices={prices} loading={loading} />
     </AppContainer>
   );
 }

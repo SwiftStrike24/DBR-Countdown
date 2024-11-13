@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { usePrices } from '../hooks/usePrices';
+import { PriceData } from '../types';
 import { AIRDROP_AMOUNT } from '../config/constants';
 
 const Container = styled.div`
@@ -94,15 +94,20 @@ const RefreshButton = styled.button<{ $isLoading?: boolean }>`
   }
 `;
 
-export const ValueDisplay: React.FC = () => {
+interface ValueDisplayProps {
+  prices: PriceData;
+  loading: boolean;
+  onRefresh: () => Promise<void>;
+}
+
+export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onRefresh }) => {
   const [currency, setCurrency] = useState<'SOL' | 'USDC'>('USDC');
-  const { prices, loading, refetch } = usePrices();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await Promise.all([
-      refetch(),
+      onRefresh(),
       new Promise(resolve => setTimeout(resolve, 800))
     ]);
     setIsRefreshing(false);
