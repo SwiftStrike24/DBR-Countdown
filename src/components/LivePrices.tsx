@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { PriceData } from '../types';
 
 const Container = styled.div`
@@ -16,14 +16,43 @@ const Container = styled.div`
   z-index: 100;
 `;
 
-const PriceRow = styled.div`
+const shimmer = keyframes`
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+`;
+
+const PriceRow = styled.div<{ $isRefreshing?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
   
   &:not(:last-child) {
     margin-bottom: 0.5rem;
   }
+
+  ${props => props.$isRefreshing && css`
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -10px;
+      right: -10px;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(251, 255, 58, 0.1),
+        transparent
+      );
+      background-size: 1000px 100%;
+      animation: ${shimmer} 1s linear infinite;
+    }
+  `}
 `;
 
 const TokenSymbol = styled.span`
@@ -38,9 +67,14 @@ const PriceValue = styled.span`
 interface LivePricesProps {
   prices: PriceData;
   loading: boolean;
+  isRefreshing?: boolean;
 }
 
-export const LivePrices: React.FC<LivePricesProps> = ({ prices, loading }) => {
+export const LivePrices: React.FC<LivePricesProps> = ({ 
+  prices, 
+  loading,
+  isRefreshing = false 
+}) => {
   const solPrice = prices?.['solana']?.['usd'] || 0;
   const dbrPrice = prices?.['debridge']?.['usd'] || 0;
 
@@ -54,11 +88,11 @@ export const LivePrices: React.FC<LivePricesProps> = ({ prices, loading }) => {
 
   return (
     <Container>
-      <PriceRow>
+      <PriceRow $isRefreshing={isRefreshing}>
         <TokenSymbol>1 SOL</TokenSymbol> = <PriceValue>${solPrice.toFixed(2)}</PriceValue>
       </PriceRow>
-      <PriceRow>
-        <TokenSymbol>1 DBR</TokenSymbol> = <PriceValue>${dbrPrice.toFixed(2)}</PriceValue>
+      <PriceRow $isRefreshing={isRefreshing}>
+        <TokenSymbol>1 DBR</TokenSymbol> = <PriceValue>${dbrPrice.toFixed(6)}</PriceValue>
       </PriceRow>
     </Container>
   );

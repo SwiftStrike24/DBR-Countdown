@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { CountdownTimer } from './components/CountdownTimer';
 import { ValueDisplay } from './components/ValueDisplay';
@@ -37,6 +37,13 @@ const Logo = styled.img`
 
 function App() {
   const { prices, loading, refetch } = usePrices();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetch();
+    setTimeout(() => setIsRefreshing(false), 800); // Match ValueDisplay animation duration
+  };
 
   return (
     <AppContainer>
@@ -44,8 +51,16 @@ function App() {
       <Title>deBridge Foundation</Title>
       <Subtitle>Second Distribution Countdown</Subtitle>
       <CountdownTimer />
-      <ValueDisplay prices={prices} loading={loading} onRefresh={refetch} />
-      <LivePrices prices={prices} loading={loading} />
+      <ValueDisplay 
+        prices={prices} 
+        loading={loading} 
+        onRefresh={handleRefresh} 
+      />
+      <LivePrices 
+        prices={prices} 
+        loading={loading} 
+        isRefreshing={isRefreshing} 
+      />
     </AppContainer>
   );
 }
