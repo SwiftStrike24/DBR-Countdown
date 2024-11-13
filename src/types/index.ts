@@ -1,7 +1,5 @@
 export interface TokenPrice {
-  id: string;
-  symbol: string;
-  current_price: number;
+  usd: number;
 }
 
 export interface PriceData {
