@@ -1,6 +1,8 @@
+import React from 'react';
 import styled from 'styled-components';
 import { CountdownTimer } from './components/CountdownTimer';
 import { ValueDisplay } from './components/ValueDisplay';
+import DbrLogo from './assets/dbr-animation.svg';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -25,18 +27,16 @@ const Subtitle = styled.h2`
   text-align: center;
 `;
 
-const Logo = styled.div`
-  width: 100px;
-  height: 100px;
-  background: #333;
-  border-radius: 50%;
+const Logo = styled.img`
+  width: 120px;
+  height: 120px;
   margin-bottom: 2rem;
 `;
 
 function App() {
   return (
     <AppContainer>
-      <Logo />
+      <Logo src={DbrLogo} alt="deBridge Logo" />
       <Title>deBridge Foundation</Title>
       <Subtitle>Second Distribution Countdown</Subtitle>
       <CountdownTimer />
