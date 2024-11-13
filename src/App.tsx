@@ -5,6 +5,7 @@ import { ValueDisplay } from './components/ValueDisplay';
 import { LivePrices } from './components/LivePrices';
 import { usePrices } from './hooks/usePrices';
 import DbrLogo from './assets/dbr-animation.svg';
+import { CurrencyToggle } from './components/CurrencyToggle';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -35,18 +36,19 @@ const Logo = styled.img`
   margin-bottom: 2rem;
 `;
 
-function App() {
+function AppContent() {
   const { prices, loading, refetch } = usePrices();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await refetch();
-    setTimeout(() => setIsRefreshing(false), 800); // Match ValueDisplay animation duration
+    setTimeout(() => setIsRefreshing(false), 800);
   };
 
   return (
     <AppContainer>
+      <CurrencyToggle />
       <Logo src={DbrLogo} alt="deBridge Logo" />
       <Title>deBridge Foundation</Title>
       <Subtitle>Second Distribution Countdown</Subtitle>
@@ -65,4 +67,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppContent;

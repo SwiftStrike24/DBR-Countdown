@@ -3,6 +3,7 @@ import { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { PriceData } from '../types';
 import { AIRDROP_AMOUNT } from '../config/constants';
+import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.1);
@@ -103,6 +104,8 @@ interface ValueDisplayProps {
 export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onRefresh }) => {
   const [currency, setCurrency] = useState<'SOL' | 'USDC'>('USDC');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { currency: fiatCurrency } = useCurrency();
+  const currencySymbol = fiatCurrency === 'USD' ? '$' : 'C$';
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -130,7 +133,7 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
         {AIRDROP_AMOUNT.toFixed(2)} DBR
         {' = '}
         {currency === 'USDC' 
-          ? `$${totalValueUSD.toFixed(2)}`
+          ? `${currencySymbol}${totalValueUSD.toFixed(2)}`
           : `${totalValueSOL.toFixed(2)} SOL`}
       </Value>
       <ButtonContainer>

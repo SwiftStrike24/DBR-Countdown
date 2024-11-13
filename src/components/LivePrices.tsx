@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { PriceData } from '../types';
+import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
   position: fixed;
@@ -75,6 +76,9 @@ export const LivePrices: React.FC<LivePricesProps> = ({
   loading,
   isRefreshing = false 
 }) => {
+  const { currency } = useCurrency();
+  const currencySymbol = currency === 'USD' ? '$' : 'C$';
+
   const solPrice = prices?.['solana']?.['usd'] || 0;
   const dbrPrice = prices?.['debridge']?.['usd'] || 0;
 
@@ -89,10 +93,10 @@ export const LivePrices: React.FC<LivePricesProps> = ({
   return (
     <Container>
       <PriceRow $isRefreshing={isRefreshing}>
-        <TokenSymbol>1 SOL</TokenSymbol> = <PriceValue>${solPrice.toFixed(2)}</PriceValue>
+        <TokenSymbol>1 SOL</TokenSymbol> = <PriceValue>{currencySymbol}{solPrice.toFixed(2)}</PriceValue>
       </PriceRow>
       <PriceRow $isRefreshing={isRefreshing}>
-        <TokenSymbol>1 DBR</TokenSymbol> = <PriceValue>${dbrPrice.toFixed(6)}</PriceValue>
+        <TokenSymbol>1 DBR</TokenSymbol> = <PriceValue>{currencySymbol}{dbrPrice.toFixed(6)}</PriceValue>
       </PriceRow>
     </Container>
   );
