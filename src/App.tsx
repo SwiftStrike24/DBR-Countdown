@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { CountdownTimer } from './components/CountdownTimer';
 import { ValueDisplay } from './components/ValueDisplay';
@@ -109,4 +109,7 @@ function AppContent() {
   );
 }
 
-export default AppContent;
+export default function App() {
+  return <AppContent />;
+}
+
