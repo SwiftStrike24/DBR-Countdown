@@ -7,9 +7,9 @@ import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.07);
-  padding: 2rem;
+  padding: 1.25rem;
   border-radius: 1.5rem;
-  margin: 2rem 0;
+  margin: 1rem 0;
   position: relative;
   width: 92%;
   max-width: 560px;
@@ -65,9 +65,9 @@ const Container = styled.div`
 const Value = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  font-size: 1.5rem;
-  margin: 1rem 0;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  margin: 0.75rem 0;
   color: #fff;
   flex-wrap: wrap;
   justify-content: center;
@@ -75,6 +75,7 @@ const Value = styled.div`
   @media (min-width: 768px) {
     font-size: 2rem;
     gap: 1.25rem;
+    margin: 1rem 0;
     flex-wrap: nowrap;
   }
 `;
@@ -161,10 +162,7 @@ const ToggleButton = styled.button`
 `;
 
 const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2rem;
+  margin-top: 1rem;
   
   @media (min-width: 768px) {
     margin-top: 2.5rem;

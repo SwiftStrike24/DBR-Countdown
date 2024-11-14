@@ -4,27 +4,29 @@ import { PriceData } from '../types';
 import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
-  position: fixed;
-  bottom: 4rem;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  margin-top: auto;
+  margin-bottom: 3rem;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   z-index: 100;
   width: 90%;
   max-width: 300px;
   
   @media (min-width: 768px) {
-    bottom: 1rem;
+    position: fixed;
+    margin-bottom: 0;
+    margin-top: 0;
+    bottom: 3rem;
     left: 1rem;
-    transform: none;
     width: auto;
     font-size: 0.9rem;
+    padding: 0.75rem 1rem;
   }
 `;
 
@@ -83,9 +85,14 @@ const PriceValue = styled.span`
 `;
 
 const TokenIcon = styled.img`
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+  
+  @media (min-width: 768px) {
+    width: 24px;
+    height: 24px;
+  }
 `;
 
 interface LivePricesProps {

@@ -9,6 +9,7 @@ import { CurrencyToggle } from './components/CurrencyToggle';
 
 const AppContainer = styled.div`
   min-height: 100vh;
+  height: 100vh;
   background: #121212;
   color: #fff;
   display: flex;
@@ -17,27 +18,45 @@ const AppContainer = styled.div`
   padding: 1rem;
   padding-top: 4rem;
   position: relative;
-
+  overflow: hidden;
+  
   @media (min-width: 768px) {
     padding: 2rem;
     padding-top: 4rem;
+    overflow-y: auto;
+  }
+`;
+
+const Logo = styled.img`
+  width: 60px;
+  height: 60px;
+  margin-bottom: 1rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  
+  @media (min-width: 768px) {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 2rem;
   }
 `;
 
 const Title = styled.h1`
-  font-size: 1.75rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
   text-align: center;
   
   @media (min-width: 768px) {
     font-size: 2.5rem;
+    margin-bottom: 0.5rem;
   }
 `;
 
 const Subtitle = styled.h2`
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: #888;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   text-align: center;
   
   @media (min-width: 768px) {
@@ -46,16 +65,14 @@ const Subtitle = styled.h2`
   }
 `;
 
-const Logo = styled.img`
-  width: 80px;
-  height: 80px;
-  margin-bottom: 1.5rem;
-  
-  @media (min-width: 768px) {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 2rem;
-  }
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(100vh - 5rem);
+  max-height: 800px;
+  width: 100%;
 `;
 
 const Attribution = styled.a`
@@ -100,20 +117,24 @@ function AppContent() {
   return (
     <AppContainer>
       <CurrencyToggle />
-      <Logo src={DbrLogo} alt="DBR Token" />
-      <Title>DBR Airdrop Tracker</Title>
-      <Subtitle>Second Distribution Countdown</Subtitle>
-      <CountdownTimer />
-      <ValueDisplay 
-        prices={prices} 
-        loading={loading} 
-        onRefresh={handleRefresh} 
-      />
-      <LivePrices 
-        prices={prices} 
-        loading={loading} 
-        isRefreshing={isRefreshing} 
-      />
+      <ContentWrapper>
+        <div style={{ width: '100%', textAlign: 'center' }}>
+          <Logo src={DbrLogo} alt="DBR Token" />
+          <Title>DBR Airdrop Tracker</Title>
+          <Subtitle>Second Distribution Countdown</Subtitle>
+        </div>
+        <CountdownTimer />
+        <ValueDisplay 
+          prices={prices} 
+          loading={loading} 
+          onRefresh={handleRefresh} 
+        />
+        <LivePrices 
+          prices={prices} 
+          loading={loading} 
+          isRefreshing={isRefreshing} 
+        />
+      </ContentWrapper>
       <Attribution 
         href="https://www.coingecko.com/en/api" 
         target="_blank" 
