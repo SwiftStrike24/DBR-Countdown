@@ -1,5 +1,6 @@
 export interface TokenPrice {
   usd: number;
+  image?: string;
 }
 
 export interface PriceData {

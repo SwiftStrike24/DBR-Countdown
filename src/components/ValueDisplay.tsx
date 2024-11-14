@@ -7,27 +7,37 @@ import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.1);
-  padding: 2rem;
+  padding: 2.5rem;
   border-radius: 1rem;
   margin: 2rem 0;
   position: relative;
+  min-width: 320px;
 `;
 
 const Value = styled.div`
-  font-size: 2rem;
-  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.75rem;
+  margin: 0.5rem 0;
   color: #fff;
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const ToggleButton = styled.button`
-  background: #444;
-  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
   cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  
   &:hover {
-    background: #555;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 `;
 
@@ -38,9 +48,9 @@ const rotate = keyframes`
 
 const ButtonContainer = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 `;
 
 const pulse = keyframes`
@@ -95,6 +105,27 @@ const RefreshButton = styled.button<{ $isLoading?: boolean }>`
   }
 `;
 
+const TokenInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.75rem;
+  min-width: fit-content;
+`;
+
+const TokenIcon = styled.img`
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+`;
+
+const Equals = styled.span`
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+`;
+
 interface ValueDisplayProps {
   prices: PriceData;
   loading: boolean;
@@ -124,17 +155,29 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
 
   const dbrPrice = prices?.['debridge']?.['usd'] || 0;
   const solPrice = prices?.['solana']?.['usd'] || 0;
+  const dbrLogo = prices?.['debridge']?.['image'];
+  const solLogo = prices?.['solana']?.['image'];
   const totalValueUSD = AIRDROP_AMOUNT * dbrPrice;
   const totalValueSOL = totalValueUSD / solPrice;
 
   return (
     <Container>
       <Value>
-        {AIRDROP_AMOUNT.toFixed(2)} DBR
-        {' = '}
-        {currency === 'USDC' 
-          ? `${currencySymbol}${totalValueUSD.toFixed(2)}`
-          : `${totalValueSOL.toFixed(2)} SOL`}
+        <TokenInfo>
+          {dbrLogo && <TokenIcon src={dbrLogo} alt="DBR" />}
+          {AIRDROP_AMOUNT.toFixed(2)} DBR
+        </TokenInfo>
+        <Equals>=</Equals>
+        <TokenInfo>
+          {currency === 'USDC' 
+            ? `${currencySymbol}${totalValueUSD.toFixed(2)}`
+            : (
+              <>
+                {solLogo && <TokenIcon src={solLogo} alt="SOL" />}
+                {`${totalValueSOL.toFixed(2)} SOL`}
+              </>
+            )}
+        </TokenInfo>
       </Value>
       <ButtonContainer>
         <ToggleButton onClick={toggleCurrency}>

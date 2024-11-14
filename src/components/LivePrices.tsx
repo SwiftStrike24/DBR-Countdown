@@ -29,7 +29,7 @@ const shimmer = keyframes`
 const PriceRow = styled.div<{ $isRefreshing?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   position: relative;
   
   &:not(:last-child) {
@@ -65,6 +65,12 @@ const PriceValue = styled.span`
   color: #fff;
 `;
 
+const TokenIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+`;
+
 interface LivePricesProps {
   prices: PriceData;
   loading: boolean;
@@ -81,6 +87,8 @@ export const LivePrices: React.FC<LivePricesProps> = ({
 
   const solPrice = prices?.['solana']?.['usd'] || 0;
   const dbrPrice = prices?.['debridge']?.['usd'] || 0;
+  const solLogo = prices?.['solana']?.['image'];
+  const dbrLogo = prices?.['debridge']?.['image'];
 
   if (loading) {
     return (
@@ -93,9 +101,11 @@ export const LivePrices: React.FC<LivePricesProps> = ({
   return (
     <Container>
       <PriceRow $isRefreshing={isRefreshing}>
+        {solLogo && <TokenIcon src={solLogo} alt="SOL" />}
         <TokenSymbol>1 SOL</TokenSymbol> = <PriceValue>{currencySymbol}{solPrice.toFixed(2)}</PriceValue>
       </PriceRow>
       <PriceRow $isRefreshing={isRefreshing}>
+        {dbrLogo && <TokenIcon src={dbrLogo} alt="DBR" />}
         <TokenSymbol>1 DBR</TokenSymbol> = <PriceValue>{currencySymbol}{dbrPrice.toFixed(6)}</PriceValue>
       </PriceRow>
     </Container>
