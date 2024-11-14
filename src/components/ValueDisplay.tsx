@@ -6,64 +6,174 @@ import { AIRDROP_AMOUNT } from '../config/constants';
 import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
-  background: rgba(255, 255, 255, 0.1);
-  padding: 1.5rem;
-  border-radius: 1rem;
-  margin: 1.5rem 0;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 2rem;
+  border-radius: 1.5rem;
+  margin: 2rem 0;
   position: relative;
-  width: 90%;
-  max-width: 500px;
+  width: 92%;
+  max-width: 560px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.3s ease;
+  animation: floatAnimation 6s ease-in-out infinite;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(251, 255, 58, 0.1);
+    border-color: rgba(251, 255, 58, 0.2);
+  }
   
   @media (min-width: 768px) {
     padding: 2.5rem;
-    margin: 2rem 0;
-    min-width: 320px;
+    margin: 2.5rem 0;
+    min-width: 420px;
     width: auto;
+  }
+
+  @keyframes floatAnimation {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 1.5rem;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(251, 255, 58, 0.03),
+      transparent
+    );
+    z-index: -1;
   }
 `;
 
 const Value = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 1.25rem;
-  margin: 0.5rem 0;
+  gap: 1rem;
+  font-size: 1.5rem;
+  margin: 1rem 0;
   color: #fff;
   flex-wrap: wrap;
   justify-content: center;
   
   @media (min-width: 768px) {
-    font-size: 1.75rem;
+    font-size: 2rem;
+    gap: 1.25rem;
+    flex-wrap: nowrap;
+  }
+`;
+
+const TokenInfo = styled.div<{ $isRefreshing?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 1rem;
+  min-width: fit-content;
+  position: relative;
+  font-size: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(251, 255, 58, 0.1);
+  }
+  
+  @media (min-width: 768px) {
     gap: 1rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  ${props => props.$isRefreshing && css`
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 1rem;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(251, 255, 58, 0.1),
+        transparent
+      );
+      background-size: 1000px 100%;
+      animation: ${shimmer} 1s linear infinite;
+    }
+  `}
+`;
+
+const TokenIcon = styled.img`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  
+  @media (min-width: 768px) {
+    width: 40px;
+    height: 40px;
   }
 `;
 
 const ToggleButton = styled.button`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.75rem;
+  background: rgba(251, 255, 58, 0.1);
+  border: 1px solid rgba(251, 255, 58, 0.2);
+  color: #FBFF3A;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 500;
   transition: all 0.2s ease;
+  backdrop-filter: blur(5px);
   
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(251, 255, 58, 0.15);
+    border-color: rgba(251, 255, 58, 0.3);
+    transform: translateY(-2px);
   }
-`;
-
-const rotate = keyframes`
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
+  
+  @media (min-width: 768px) {
+    margin-top: 2.5rem;
+  }
+`;
+
+const rotate = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 `;
 
 const pulse = keyframes`
@@ -116,50 +226,6 @@ const RefreshButton = styled.button<{ $isLoading?: boolean }>`
   &:disabled {
     cursor: not-allowed;
   }
-`;
-
-const TokenInfo = styled.div<{ $isRefreshing?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 0.75rem;
-  min-width: fit-content;
-  position: relative;
-  font-size: 0.9rem;
-  
-  @media (min-width: 768px) {
-    gap: 0.75rem;
-    padding: 0.5rem;
-    font-size: 1rem;
-  }
-
-  ${props => props.$isRefreshing && css`
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 0.75rem;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(251, 255, 58, 0.1),
-        transparent
-      );
-      background-size: 1000px 100%;
-      animation: ${shimmer} 1s linear infinite;
-    }
-  `}
-`;
-
-const TokenIcon = styled.img`
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
 `;
 
 const Equals = styled.span`
