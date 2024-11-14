@@ -7,22 +7,35 @@ import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.1);
-  padding: 2.5rem;
+  padding: 1.5rem;
   border-radius: 1rem;
-  margin: 2rem 0;
+  margin: 1.5rem 0;
   position: relative;
-  min-width: 320px;
+  width: 90%;
+  max-width: 500px;
+  
+  @media (min-width: 768px) {
+    padding: 2.5rem;
+    margin: 2rem 0;
+    min-width: 320px;
+    width: auto;
+  }
 `;
 
 const Value = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  font-size: 1.75rem;
+  gap: 0.75rem;
+  font-size: 1.25rem;
   margin: 0.5rem 0;
   color: #fff;
   flex-wrap: wrap;
   justify-content: center;
+  
+  @media (min-width: 768px) {
+    font-size: 1.75rem;
+    gap: 1rem;
+  }
 `;
 
 const ToggleButton = styled.button`
@@ -108,12 +121,19 @@ const RefreshButton = styled.button<{ $isLoading?: boolean }>`
 const TokenInfo = styled.div<{ $isRefreshing?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
+  gap: 0.5rem;
+  padding: 0.4rem;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 0.75rem;
   min-width: fit-content;
   position: relative;
+  font-size: 0.9rem;
+  
+  @media (min-width: 768px) {
+    gap: 0.75rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+  }
 
   ${props => props.$isRefreshing && css`
     &::before {

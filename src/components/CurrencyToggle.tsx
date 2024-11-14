@@ -5,27 +5,43 @@ import { SupportedCurrency } from '../types';
 
 const Container = styled.div`
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  top: 0.5rem;
+  right: 50%;
+  transform: translateX(50%);
   display: flex;
   gap: 0.5rem;
   z-index: 100;
+  
+  @media (min-width: 768px) {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    transform: none;
+  }
 `;
 
 const CurrencyButton = styled.button<{ $active: boolean }>`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  min-width: 80px;
+  font-size: 0.85rem;
+  
+  @media (min-width: 768px) {
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    min-width: 100px;
+    font-size: 1rem;
+  }
   background: ${props => props.$active ? 'rgba(251, 255, 58, 0.1)' : 'rgba(0, 0, 0, 0.7)'};
   border: 1px solid ${props => props.$active ? '#FBFF3A' : 'rgba(255, 255, 255, 0.1)'};
   color: ${props => props.$active ? '#FBFF3A' : '#fff'};
-  padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
   backdrop-filter: blur(10px);
   transition: all 0.2s ease;
   font-weight: 500;
-  min-width: 100px;
   justify-content: center;
 
   &:hover {

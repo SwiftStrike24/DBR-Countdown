@@ -4,8 +4,16 @@ import { useCountdown } from '../hooks/useCountdown';
 
 const TimerContainer = styled.div`
   display: flex;
-  gap: 2rem;
-  margin: 2rem 0;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  
+  @media (min-width: 768px) {
+    gap: 2rem;
+    margin: 2rem 0;
+    flex-wrap: nowrap;
+  }
 `;
 
 const TimeUnitContainer = styled.div`
@@ -13,9 +21,13 @@ const TimeUnitContainer = styled.div`
 `;
 
 const TimeValue = styled.div`
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #fff;
+  
+  @media (min-width: 768px) {
+    font-size: 3rem;
+  }
 `;
 
 const TimeLabel = styled.div`
@@ -25,11 +37,16 @@ const TimeLabel = styled.div`
 `;
 
 const CompletedMessage = styled.div`
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #FBFF3A;
   font-weight: bold;
   text-align: center;
-  padding: 2rem;
+  padding: 1.5rem;
+  
+  @media (min-width: 768px) {
+    font-size: 2rem;
+    padding: 2rem;
+  }
 `;
 
 const ClaimButton = styled.a`

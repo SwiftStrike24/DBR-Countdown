@@ -14,27 +14,48 @@ const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem;
+  padding-top: 4rem;
   position: relative;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+    padding-top: 4rem;
+  }
 `;
 
 const Title = styled.h1`
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   margin-bottom: 0.5rem;
   text-align: center;
+  
+  @media (min-width: 768px) {
+    font-size: 2.5rem;
+  }
 `;
 
 const Subtitle = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: #888;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
+  
+  @media (min-width: 768px) {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
 `;
 
 const Logo = styled.img`
-  width: 120px;
-  height: 120px;
-  margin-bottom: 2rem;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  
+  @media (min-width: 768px) {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 2rem;
+  }
 `;
 
 const Attribution = styled.a`

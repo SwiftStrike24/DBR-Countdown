@@ -5,16 +5,27 @@ import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
   position: fixed;
-  bottom: 1rem;
-  left: 1rem;
+  bottom: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   z-index: 100;
+  width: 90%;
+  max-width: 300px;
+  
+  @media (min-width: 768px) {
+    bottom: 1rem;
+    left: 1rem;
+    transform: none;
+    width: auto;
+    font-size: 0.9rem;
+  }
 `;
 
 const shimmer = keyframes`
@@ -29,8 +40,14 @@ const shimmer = keyframes`
 const PriceRow = styled.div<{ $isRefreshing?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  gap: 0.5rem;
   position: relative;
+  
+  @media (min-width: 768px) {
+    justify-content: flex-start;
+    gap: 0.75rem;
+  }
   
   &:not(:last-child) {
     margin-bottom: 0.5rem;
