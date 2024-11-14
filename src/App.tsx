@@ -6,6 +6,7 @@ import { LivePrices } from './components/LivePrices';
 import { usePrices } from './hooks/usePrices';
 import DbrLogo from './assets/dbr-animation.svg';
 import { CurrencyToggle } from './components/CurrencyToggle';
+import { AirdropProvider } from './context/AirdropContext';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -124,11 +125,13 @@ function AppContent() {
           <Subtitle>Second Distribution Countdown</Subtitle>
         </div>
         <CountdownTimer />
-        <ValueDisplay 
-          prices={prices} 
-          loading={loading} 
-          onRefresh={handleRefresh} 
-        />
+        <AirdropProvider>
+          <ValueDisplay 
+            prices={prices} 
+            loading={loading} 
+            onRefresh={handleRefresh} 
+          />
+        </AirdropProvider>
         <LivePrices 
           prices={prices} 
           loading={loading} 

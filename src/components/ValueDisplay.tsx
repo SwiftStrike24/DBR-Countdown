@@ -4,6 +4,7 @@ import styled, { keyframes, css } from 'styled-components';
 import { PriceData } from '../types';
 import { AIRDROP_AMOUNT } from '../config/constants';
 import { useCurrency } from '../context/CurrencyContext';
+import { useAirdrop } from '../context/AirdropContext';
 
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.07);
@@ -240,6 +241,105 @@ const shimmer = keyframes`
   }
 `;
 
+const EditButton = styled.button`
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #FBFF3A;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+`;
+
+const Modal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+`;
+
+const ModalContent = styled.div`
+  background: #1a1a1a;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 400px;
+  border: 1px solid rgba(251, 255, 58, 0.1);
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 1rem;
+  margin: 1rem 0;
+  
+  &:focus {
+    outline: none;
+    border-color: #FBFF3A;
+  }
+`;
+
+const ModalButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+`;
+
+const ModalButton = styled.button<{ $primary?: boolean }>`
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  background: ${props => props.$primary ? 'rgba(251, 255, 58, 0.1)' : 'rgba(255, 255, 255, 0.1)'};
+  border: 1px solid ${props => props.$primary ? '#FBFF3A' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.$primary ? '#FBFF3A' : '#fff'};
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${props => props.$primary ? 'rgba(251, 255, 58, 0.15)' : 'rgba(255, 255, 255, 0.15)'};
+  }
+`;
+
+const DefaultButton = styled.button`
+  padding: 0.5rem 1rem;
+  background: rgba(251, 255, 58, 0.05);
+  border: 1px solid rgba(251, 255, 58, 0.1);
+  border-radius: 0.5rem;
+  color: #FBFF3A;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+
+  &:hover {
+    background: rgba(251, 255, 58, 0.1);
+    border-color: rgba(251, 255, 58, 0.2);
+  }
+`;
+
 interface ValueDisplayProps {
   prices: PriceData;
   loading: boolean;
@@ -249,7 +349,10 @@ interface ValueDisplayProps {
 export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onRefresh }) => {
   const [currency, setCurrency] = useState<'SOL' | 'USDC'>('USDC');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [inputValue, setInputValue] = useState('');
   const { currency: fiatCurrency } = useCurrency();
+  const { airdropAmount, setAirdropAmount } = useAirdrop();
   const currencySymbol = fiatCurrency === 'USD' ? '$' : 'C$';
 
   const handleRefresh = async () => {
@@ -265,50 +368,99 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
     setCurrency(prev => prev === 'USDC' ? 'SOL' : 'USDC');
   };
 
+  const handleEditClick = () => {
+    setInputValue(airdropAmount.toString());
+    setShowModal(true);
+  };
+
+  const handleSave = () => {
+    const newAmount = parseFloat(inputValue);
+    if (!isNaN(newAmount) && newAmount > 0) {
+      setAirdropAmount(newAmount);
+    }
+    setShowModal(false);
+  };
+
+  const handleSetDefault = () => {
+    setInputValue(AIRDROP_AMOUNT.toString());
+  };
+
   if (loading) return <div>Loading prices...</div>;
 
   const dbrPrice = prices?.['debridge']?.['usd'] || 0;
   const solPrice = prices?.['solana']?.['usd'] || 0;
   const dbrLogo = prices?.['debridge']?.['image'];
   const solLogo = prices?.['solana']?.['image'];
-  const totalValueUSD = AIRDROP_AMOUNT * dbrPrice;
+  const totalValueUSD = airdropAmount * dbrPrice;
   const totalValueSOL = totalValueUSD / solPrice;
 
   return (
-    <Container>
-      <Value>
-        <TokenInfo $isRefreshing={isRefreshing}>
-          {dbrLogo && <TokenIcon src={dbrLogo} alt="DBR" />}
-          {AIRDROP_AMOUNT.toFixed(2)} DBR
-        </TokenInfo>
-        <Equals>=</Equals>
-        <TokenInfo $isRefreshing={isRefreshing}>
-          {currency === 'USDC' 
-            ? `${currencySymbol}${totalValueUSD.toFixed(2)}`
-            : (
-              <>
-                {solLogo && <TokenIcon src={solLogo} alt="SOL" />}
-                {`${totalValueSOL.toFixed(2)} SOL`}
-              </>
-            )}
-        </TokenInfo>
-      </Value>
-      <ButtonContainer>
-        <ToggleButton onClick={toggleCurrency}>
-          Show in {currency === 'USDC' ? 'SOL' : 'USDC'}
-        </ToggleButton>
-      </ButtonContainer>
-      <RefreshButton 
-        onClick={handleRefresh} 
-        disabled={isRefreshing}
-        $isLoading={isRefreshing}
-        title="Refresh prices"
-        aria-label="Refresh prices"
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M13.666 2.334A7.956 7.956 0 0 0 8 0C3.582 0 0 3.582 0 8s3.582 8 8 8c3.866 0 7.078-2.746 7.809-6.4h-2.155A5.987 5.987 0 0 1 8 14c-3.309 0-6-2.691-6-6s2.691-6 6-6c1.555 0 2.961.6 4.027 1.573L9.414 6H16V0l-2.334 2.334z" fill="currentColor"/>
-        </svg>
-      </RefreshButton>
-    </Container>
+    <>
+      <Container>
+        <EditButton onClick={handleEditClick} title="Edit airdrop amount">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+        </EditButton>
+        <Value>
+          <TokenInfo $isRefreshing={isRefreshing}>
+            {dbrLogo && <TokenIcon src={dbrLogo} alt="DBR" />}
+            {airdropAmount.toFixed(2)} DBR
+          </TokenInfo>
+          <Equals>=</Equals>
+          <TokenInfo $isRefreshing={isRefreshing}>
+            {currency === 'USDC' 
+              ? `${currencySymbol}${totalValueUSD.toFixed(2)}`
+              : (
+                <>
+                  {solLogo && <TokenIcon src={solLogo} alt="SOL" />}
+                  {`${totalValueSOL.toFixed(2)} SOL`}
+                </>
+              )}
+          </TokenInfo>
+        </Value>
+        <ButtonContainer>
+          <ToggleButton onClick={toggleCurrency}>
+            Show in {currency === 'USDC' ? 'SOL' : 'USDC'}
+          </ToggleButton>
+        </ButtonContainer>
+        <RefreshButton 
+          onClick={handleRefresh} 
+          disabled={isRefreshing}
+          $isLoading={isRefreshing}
+          title="Refresh prices"
+          aria-label="Refresh prices"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13.666 2.334A7.956 7.956 0 0 0 8 0C3.582 0 0 3.582 0 8s3.582 8 8 8c3.866 0 7.078-2.746 7.809-6.4h-2.155A5.987 5.987 0 0 1 8 14c-3.309 0-6-2.691-6-6s2.691-6 6-6c1.555 0 2.961.6 4.027 1.573L9.414 6H16V0l-2.334 2.334z" fill="currentColor"/>
+          </svg>
+        </RefreshButton>
+      </Container>
+
+      {showModal && (
+        <Modal onClick={() => setShowModal(false)}>
+          <ModalContent onClick={e => e.stopPropagation()}>
+            <h3>Edit Airdrop Amount</h3>
+            <DefaultButton onClick={handleSetDefault}>
+              Set Default (14,233.97 DBR)
+            </DefaultButton>
+            <Input
+              type="number"
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              placeholder="Enter DBR amount"
+              step="0.01"
+              min="0"
+              autoFocus
+            />
+            <ModalButtons>
+              <ModalButton onClick={() => setShowModal(false)}>Cancel</ModalButton>
+              <ModalButton $primary onClick={handleSave}>Save</ModalButton>
+            </ModalButtons>
+          </ModalContent>
+        </Modal>
+      )}
+    </>
   );
 };
