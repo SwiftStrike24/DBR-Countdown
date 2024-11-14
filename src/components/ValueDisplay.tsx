@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { PriceData } from '../types';
 import { AIRDROP_AMOUNT } from '../config/constants';
 import { useCurrency } from '../context/CurrencyContext';
@@ -105,7 +105,7 @@ const RefreshButton = styled.button<{ $isLoading?: boolean }>`
   }
 `;
 
-const TokenInfo = styled.div`
+const TokenInfo = styled.div<{ $isRefreshing?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -113,6 +113,27 @@ const TokenInfo = styled.div`
   background: rgba(0, 0, 0, 0.2);
   border-radius: 0.75rem;
   min-width: fit-content;
+  position: relative;
+
+  ${props => props.$isRefreshing && css`
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 0.75rem;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(251, 255, 58, 0.1),
+        transparent
+      );
+      background-size: 1000px 100%;
+      animation: ${shimmer} 1s linear infinite;
+    }
+  `}
 `;
 
 const TokenIcon = styled.img`
@@ -124,6 +145,15 @@ const TokenIcon = styled.img`
 const Equals = styled.span`
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
+`;
+
+const shimmer = keyframes`
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
 `;
 
 interface ValueDisplayProps {
@@ -163,12 +193,12 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
   return (
     <Container>
       <Value>
-        <TokenInfo>
+        <TokenInfo $isRefreshing={isRefreshing}>
           {dbrLogo && <TokenIcon src={dbrLogo} alt="DBR" />}
           {AIRDROP_AMOUNT.toFixed(2)} DBR
         </TokenInfo>
         <Equals>=</Equals>
-        <TokenInfo>
+        <TokenInfo $isRefreshing={isRefreshing}>
           {currency === 'USDC' 
             ? `${currencySymbol}${totalValueUSD.toFixed(2)}`
             : (

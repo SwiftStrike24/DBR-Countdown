@@ -79,8 +79,8 @@ function AppContent() {
   return (
     <AppContainer>
       <CurrencyToggle />
-      <Logo src={DbrLogo} alt="deBridge Logo" />
-      <Title>deBridge Foundation</Title>
+      <Logo src={DbrLogo} alt="DBR Token" />
+      <Title>DBR Airdrop Tracker</Title>
       <Subtitle>Second Distribution Countdown</Subtitle>
       <CountdownTimer />
       <ValueDisplay 
