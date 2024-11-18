@@ -329,7 +329,8 @@ export const PriceChart = () => {
                 fontSize: window.innerWidth <= 480 ? 10 : 12 
               }}
               tickFormatter={(value) => {
-                return `$${Number(value).toFixed(4)}`
+                const roundedValue = Number(value).toFixed(3);
+                return `$${roundedValue}`;
               }}
               width={window.innerWidth <= 480 ? 60 : 70}
               tickCount={5}
