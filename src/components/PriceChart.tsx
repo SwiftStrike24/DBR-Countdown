@@ -14,14 +14,17 @@ import { format } from 'date-fns';
 import { TOKEN_IDS, COINGECKO_API_KEY } from '../config/constants';
 
 const ChartContainer = styled.div`
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   width: 100%;
   max-width: 1200px;
-  height: 400px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
+  height: 350px;
   position: relative;
   overflow: hidden;
   margin: 0 auto;
@@ -36,17 +39,19 @@ const ChartContainer = styled.div`
   
   @media (max-width: 992px) {
     max-width: 92%;
-    height: 450px;
-    padding: 1.25rem;
+    height: 300px;
+    padding: 0.75rem;
   }
   
   @media (max-width: 768px) {
-    height: 400px;
-    padding: 1rem;
+    height: 300px;
+    padding: 0.5rem;
   }
   
   @media (max-width: 480px) {
-    height: 350px;
+    height: 250px;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
   }
 `;
 
@@ -159,11 +164,25 @@ const getTimeframeParams = (timeframe: Timeframe): { days: string; interval?: st
   }
 };
 
+const calculateDomain = (data: ChartDataPoint[]) => {
+  if (!data.length) return ['auto', 'auto'];
+  const prices = data.map(d => d.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const padding = (max - min) * 0.1; // Add 10% padding
+  return [min - padding, max + padding];
+};
+
+const getTickCount = (timeframe: Timeframe, isMobile: boolean): number => {
+  return isMobile ? 6 : 8;
+};
+
 export const PriceChart = () => {
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [timeframe, setTimeframe] = useState<Timeframe>('7D');
   const [error, setError] = useState<string | null>(null);
+  const [displayTicks, setDisplayTicks] = useState<number[]>([]);
 
   const fetchPriceHistory = async (selectedTimeframe: Timeframe) => {
     try {
@@ -198,10 +217,14 @@ export const PriceChart = () => {
         formattedDate: format(new Date(timestamp), formatString),
       }));
 
-      if (selectedTimeframe === '24H') {
-        formattedData = formattedData.filter((_, index) => index % 6 === 0);
-      }
+      const displayTicks = formattedData.filter((_, index) => {
+        const totalPoints = formattedData.length;
+        const tickCount = getTickCount(selectedTimeframe, window.innerWidth <= 480);
+        const interval = Math.floor(totalPoints / (tickCount - 1));
+        return index === 0 || index === totalPoints - 1 || index % interval === 0;
+      });
 
+      setDisplayTicks(displayTicks.map(d => d.timestamp));
       setChartData(formattedData);
     } catch (error: any) {
       console.error('Error details:', {
@@ -248,30 +271,67 @@ export const PriceChart = () => {
         </div>
       )}
       {!loading && !error && chartData.length > 0 && (
-        <ResponsiveContainer width="100%" height={330}>
-          <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+        <ResponsiveContainer width="100%" height={window.innerWidth <= 480 ? 200 : 300}>
+          <LineChart 
+            data={chartData} 
+            margin={{ 
+              top: 10, 
+              right: window.innerWidth <= 480 ? 15 : 25, 
+              left: window.innerWidth <= 480 ? 0 : 0, 
+              bottom: window.innerWidth <= 480 ? 10 : 5 
+            }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
             <XAxis
               dataKey="timestamp"
-              tickFormatter={(timestamp) => 
-                format(new Date(timestamp), timeframe === '24H' ? 'HH:mm' : 'MMM d')}
-              stroke="#888"
-              tick={{ fill: '#888', fontSize: 12 }}
+              tickFormatter={(timestamp) => {
+                const date = new Date(timestamp);
+                if (timeframe === '24H') {
+                  return format(date, 'HH:mm');
+                } else if (timeframe === '7D') {
+                  return format(date, 'MMM d');
+                } else {
+                  return format(date, 'MMM d');
+                }
+              }}
+              ticks={displayTicks}
+              tick={{ 
+                fill: '#fff', 
+                fontSize: window.innerWidth <= 480 ? 10 : 12,
+                dy: window.innerWidth <= 480 ? 5 : 0
+              }}
+              height={window.innerWidth <= 480 ? 40 : 30}
+              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+              tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
             />
-            <YAxis
-              stroke="#888"
-              tick={{ fill: '#888', fontSize: 12 }}
-              tickFormatter={(value) => `$${value.toFixed(2)}`}
-              domain={['auto', 'auto']}
+            <YAxis 
+              domain={calculateDomain(chartData)}
+              tick={{ 
+                fill: '#fff', 
+                fontSize: window.innerWidth <= 480 ? 10 : 12 
+              }}
+              tickFormatter={(value) => {
+                return `$${Number(value).toFixed(4)}`
+              }}
+              width={window.innerWidth <= 480 ? 60 : 70}
+              tickCount={5}
+              allowDecimals={true}
+              scale="linear"
+              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+              tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              content={<CustomTooltip />}
+              animationDuration={200}
+            />
             <Line
               type="monotone"
               dataKey="price"
               stroke="#FBFF3A"
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 4, fill: '#FBFF3A' }}
+              activeDot={{ r: 4, fill: "#FBFF3A" }}
+              animationDuration={500}
             />
           </LineChart>
         </ResponsiveContainer>

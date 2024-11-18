@@ -11,22 +11,14 @@ import { AirdropProvider } from './context/AirdropContext';
 
 const AppContainer = styled.div`
   min-height: 100vh;
-  height: 100vh;
-  background: #121212;
-  color: #fff;
+  width: 100%;
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
-  padding-top: 4rem;
-  position: relative;
-  overflow: hidden;
-  
-  @media (min-width: 768px) {
-    padding: 2rem;
-    padding-top: 4rem;
-    overflow-y: auto;
-  }
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const Logo = styled.img`
@@ -68,15 +60,28 @@ const Subtitle = styled.h2`
 `;
 
 const ContentWrapper = styled.div`
+  width: 100%;
+  max-width: 1400px;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: calc(100vh - 5rem);
-  max-height: 800px;
-  width: 100%;
-  position: relative;
-  z-index: 2;
+  gap: 2rem;
+  margin: 0 auto;
+  
+  @media (max-width: 992px) {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
 `;
 
 const MainContent = styled.div`
