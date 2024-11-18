@@ -95,10 +95,19 @@ const PriceSection = styled.div`
   justify-content: center;
   gap: 2rem;
   width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  
+  @media (max-width: 1200px) {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
   
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
+    gap: 1rem;
+    padding: 0;
   }
 `;
 

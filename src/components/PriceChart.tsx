@@ -16,17 +16,39 @@ import { TOKEN_IDS, COINGECKO_API_KEY } from '../config/constants';
 
 const ChartContainer = styled.div`
   width: 100%;
-  max-width: 400px;
+  max-width: 1200px;
   height: 400px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 16px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: 1.5rem;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
-  align-self: flex-start;
+  margin: 0 auto;
+  
+  @media (max-width: 1400px) {
+    max-width: 1000px;
+  }
+  
+  @media (max-width: 1200px) {
+    max-width: 800px;
+  }
+  
+  @media (max-width: 992px) {
+    max-width: 92%;
+    height: 450px;
+    padding: 1.25rem;
+  }
+  
+  @media (max-width: 768px) {
+    height: 400px;
+    padding: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    height: 350px;
+  }
 `;
 
 const LoadingOverlay = styled.div`

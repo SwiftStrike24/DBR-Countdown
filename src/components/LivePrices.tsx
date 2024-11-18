@@ -5,28 +5,28 @@ import { useCurrency } from '../context/CurrencyContext';
 
 const Container = styled.div`
   position: relative;
-  margin-top: auto;
-  margin-bottom: 3rem;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   z-index: 100;
-  width: 90%;
-  max-width: 300px;
-  
-  @media (min-width: 768px) {
-    position: fixed;
-    margin-bottom: 0;
-    margin-top: 0;
-    bottom: 3rem;
-    left: 1rem;
-    width: auto;
-    font-size: 0.9rem;
-    padding: 0.75rem 1rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+
+  @media (max-width: 1200px) {
+    max-width: 500px;
+    font-size: 0.8rem;
+    padding: 0.6rem 0.85rem;
+  }
+
+  @media (max-width: 768px) {
+    width: 92%;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
   }
 `;
 
@@ -45,12 +45,12 @@ const PriceRow = styled.div<{ $isRefreshing?: boolean }>`
   justify-content: center;
   gap: 0.5rem;
   position: relative;
-  
+
   @media (min-width: 768px) {
     justify-content: flex-start;
     gap: 0.75rem;
   }
-  
+
   &:not(:last-child) {
     margin-bottom: 0.5rem;
   }
@@ -88,7 +88,7 @@ const TokenIcon = styled.img`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  
+
   @media (min-width: 768px) {
     width: 24px;
     height: 24px;
@@ -112,7 +112,7 @@ export const LivePrices: React.FC<LivePricesProps> = ({
   const solPrice = prices?.['solana']?.['usd'] || 0;
   const dbrPrice = prices?.['debridge']?.['usd'] || 0;
   const solLogo = prices?.['solana']?.['image'];
-  const dbrLogo = prices?.['debridge']?.['image'];
+  const dbrLogo = prices?.['debridge']?.['image']
 
   if (loading) {
     return (

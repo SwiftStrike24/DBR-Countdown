@@ -8,12 +8,12 @@ import { useAirdrop } from '../context/AirdropContext';
 
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.07);
-  padding: 1.25rem;
+  padding: 2rem;
   border-radius: 1.5rem;
-  margin: 1rem 0;
   position: relative;
-  width: 92%;
-  max-width: 560px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 1rem;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -26,11 +26,15 @@ const Container = styled.div`
     border-color: rgba(251, 255, 58, 0.2);
   }
   
-  @media (min-width: 768px) {
-    padding: 2.5rem;
-    margin: 2.5rem 0;
-    min-width: 420px;
-    width: auto;
+  @media (max-width: 1200px) {
+    padding: 1.75rem;
+    max-width: 500px;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    width: 92%;
+    margin: 0.5rem auto;
   }
 
   @keyframes floatAnimation {
@@ -66,18 +70,20 @@ const Container = styled.div`
 const Value = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   font-size: 1.25rem;
-  margin: 0.75rem 0;
+  margin: 1rem 0;
   color: #fff;
   flex-wrap: wrap;
   justify-content: center;
+  padding: 0.5rem;
   
   @media (min-width: 768px) {
     font-size: 2rem;
-    gap: 1.25rem;
-    margin: 1rem 0;
+    gap: 1.5rem;
+    margin: 1.25rem 0;
     flex-wrap: nowrap;
+    padding: 0.75rem;
   }
 `;
 
@@ -93,38 +99,42 @@ const TokenInfo = styled.div<{ $isRefreshing?: boolean }>`
   font-size: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
   
   &:hover {
+    border-color: rgba(251, 255, 58, 0.2);
     background: rgba(0, 0, 0, 0.4);
-    border-color: rgba(251, 255, 58, 0.1);
-  }
-  
-  @media (min-width: 768px) {
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    font-size: 1.5rem;
-    flex-shrink: 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3),
+                0 0 10px rgba(251, 255, 58, 0.1);
   }
 
   ${props => props.$isRefreshing && css`
-    &::before {
+    &::after {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      border-radius: 1rem;
       background: linear-gradient(
         90deg,
         transparent,
-        rgba(251, 255, 58, 0.1),
+        rgba(255, 255, 255, 0.1),
         transparent
       );
-      background-size: 1000px 100%;
-      animation: ${shimmer} 1s linear infinite;
+      animation: shimmer 1.5s infinite;
     }
   `}
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
 `;
 
 const TokenIcon = styled.img`
