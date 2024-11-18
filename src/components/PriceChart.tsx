@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import {
   LineChart,
@@ -12,6 +12,17 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import { TOKEN_IDS, COINGECKO_API_KEY } from '../config/constants';
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 const ChartContainer = styled.div`
   background: rgba(0, 0, 0, 0.2);
@@ -28,26 +39,27 @@ const ChartContainer = styled.div`
   position: relative;
   overflow: hidden;
   margin: 0 auto;
-  
+  animation: ${fadeIn} 0.6s ease-out;
+
   @media (max-width: 1400px) {
     max-width: 1000px;
   }
-  
+
   @media (max-width: 1200px) {
     max-width: 800px;
   }
-  
+
   @media (max-width: 992px) {
     max-width: 92%;
     height: 300px;
     padding: 0.75rem;
   }
-  
+
   @media (max-width: 768px) {
     height: 300px;
     padding: 0.5rem;
   }
-  
+
   @media (max-width: 480px) {
     height: 250px;
     margin-bottom: 1rem;
@@ -68,6 +80,8 @@ const LoadingOverlay = styled.div`
   color: #fff;
   font-size: 1rem;
   z-index: 10;
+  opacity: 0;
+  animation: ${fadeIn} 0.3s ease-out forwards;
 `;
 
 const ChartHeader = styled.div`
@@ -281,7 +295,11 @@ export const PriceChart = () => {
               bottom: window.innerWidth <= 480 ? 10 : 5 
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke="rgba(255,255,255,0.1)" 
+              vertical={false}
+            />
             <XAxis
               dataKey="timestamp"
               tickFormatter={(timestamp) => {
@@ -330,8 +348,15 @@ export const PriceChart = () => {
               stroke="#FBFF3A"
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 4, fill: "#FBFF3A" }}
-              animationDuration={500}
+              activeDot={{ 
+                r: 6, 
+                fill: "#FBFF3A",
+                stroke: "rgba(251, 255, 58, 0.3)",
+                strokeWidth: 4
+              }}
+              animationDuration={1500}
+              animationBegin={300}
+              animationEasing="ease-out"
             />
           </LineChart>
         </ResponsiveContainer>
