@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { CountdownTimer } from './components/CountdownTimer';
 import { ValueDisplay } from './components/ValueDisplay';
 import { LivePrices } from './components/LivePrices';
+import { PriceChart } from './components/PriceChart';
 import { usePrices } from './hooks/usePrices';
 import DbrLogo from './assets/dbr-animation.svg';
 import { CurrencyToggle } from './components/CurrencyToggle';
@@ -74,6 +75,31 @@ const ContentWrapper = styled.div`
   height: calc(100vh - 5rem);
   max-height: 800px;
   width: 100%;
+  position: relative;
+  z-index: 2;
+`;
+
+const MainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const PriceSection = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const Attribution = styled.a`
@@ -119,24 +145,31 @@ function AppContent() {
     <AppContainer>
       <CurrencyToggle />
       <ContentWrapper>
-        <div style={{ width: '100%', textAlign: 'center' }}>
-          <Logo src={DbrLogo} alt="DBR Token" />
-          <Title>DBR Airdrop Tracker</Title>
-          <Subtitle>Second Distribution Countdown</Subtitle>
-        </div>
-        <CountdownTimer />
-        <AirdropProvider>
-          <ValueDisplay 
-            prices={prices} 
-            loading={loading} 
-            onRefresh={handleRefresh} 
-          />
-        </AirdropProvider>
-        <LivePrices 
-          prices={prices} 
-          loading={loading} 
-          isRefreshing={isRefreshing} 
-        />
+        <MainContent>
+          <div style={{ width: '100%', textAlign: 'center' }}>
+            <Logo src={DbrLogo} alt="DBR Token" />
+            <Title>DBR Airdrop Tracker</Title>
+            <Subtitle>Second Distribution Countdown</Subtitle>
+          </div>
+          <CountdownTimer />
+          <AirdropProvider>
+            <PriceSection>
+              <PriceChart />
+              <div style={{ flex: 1, width: '100%' }}>
+                <ValueDisplay 
+                  prices={prices} 
+                  loading={loading} 
+                  onRefresh={handleRefresh} 
+                />
+                <LivePrices 
+                  prices={prices} 
+                  loading={loading} 
+                  isRefreshing={isRefreshing} 
+                />
+              </div>
+            </PriceSection>
+          </AirdropProvider>
+        </MainContent>
       </ContentWrapper>
       <Attribution 
         href="https://www.coingecko.com/en/api" 
@@ -157,4 +190,3 @@ function AppContent() {
 export default function App() {
   return <AppContent />;
 }
-
