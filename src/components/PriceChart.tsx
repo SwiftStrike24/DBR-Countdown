@@ -140,7 +140,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
         }}
       >
         <p style={{ color: '#fff', margin: 0 }}>
-          {label ? format(new Date(parseInt(label)), 'MMM d, yyyy HH:mm') : ''}
+          {label ? format(new Date(parseInt(label)), 'MMM d, yyyy h:mm a') : ''}
         </p>
         <p style={{ color: '#FBFF3A', margin: '4px 0 0 0' }}>
           ${payload[0].value.toFixed(4)}
@@ -287,7 +287,7 @@ export const PriceChart = () => {
               tickFormatter={(timestamp) => {
                 const date = new Date(timestamp);
                 if (timeframe === '24H') {
-                  return format(date, 'HH:mm');
+                  return format(date, 'h:mm a');
                 } else if (timeframe === '7D') {
                   return format(date, 'MMM d');
                 } else {
