@@ -9,7 +9,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  TooltipProps,
 } from 'recharts';
 import { format } from 'date-fns';
 import { TOKEN_IDS, COINGECKO_API_KEY } from '../config/constants';

@@ -87,6 +87,11 @@ const Value = styled.div`
   }
 `;
 
+const shimmerAnimation = keyframes`
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+`;
+
 const TokenInfo = styled.div<{ $isRefreshing?: boolean }>`
   display: flex;
   align-items: center;
@@ -109,7 +114,7 @@ const TokenInfo = styled.div<{ $isRefreshing?: boolean }>`
                 0 0 10px rgba(251, 255, 58, 0.1);
   }
 
-  ${props => props.$isRefreshing && css`
+  ${(props: { $isRefreshing?: boolean }) => props.$isRefreshing && css`
     &::after {
       content: '';
       position: absolute;
@@ -123,18 +128,9 @@ const TokenInfo = styled.div<{ $isRefreshing?: boolean }>`
         rgba(255, 255, 255, 0.1),
         transparent
       );
-      animation: shimmer 1.5s infinite;
+      animation: ${shimmerAnimation} 1.5s infinite;
     }
   `}
-
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(100%);
-    }
-  }
 `;
 
 const TokenIcon = styled.img`
@@ -195,7 +191,7 @@ const RefreshButton = styled.button<{ $isLoading?: boolean }>`
   position: absolute;
   bottom: 1rem;
   right: 1rem;
-  background: ${props => props.$isLoading ? '#3a3a3a' : '#2a2a2a'};
+  background: ${(props: { $isLoading?: boolean }) => props.$isLoading ? '#3a3a3a' : '#2a2a2a'};
   border: none;
   color: #fff;
   padding: 0.5rem;
@@ -215,21 +211,21 @@ const RefreshButton = styled.button<{ $isLoading?: boolean }>`
     height: 100%;
     border-radius: 50%;
     border: 2px solid #FBFF3A;
-    opacity: ${props => props.$isLoading ? 1 : 0};
+    opacity: ${(props: { $isLoading?: boolean }) => props.$isLoading ? 1 : 0};
     animation: ${pulse} 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
   
   svg {
     transform-origin: center;
     animation: ${rotate} 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    animation-play-state: ${props => props.$isLoading ? 'running' : 'paused'};
-    opacity: ${props => props.$isLoading ? 0.7 : 1};
+    animation-play-state: ${(props: { $isLoading?: boolean }) => props.$isLoading ? 'running' : 'paused'};
+    opacity: ${(props: { $isLoading?: boolean }) => props.$isLoading ? 0.7 : 1};
     transition: opacity 0.3s;
   }
 
   &:hover {
     background: #333;
-    transform: ${props => props.$isLoading ? 'none' : 'scale(1.1)'};
+    transform: ${(props: { $isLoading?: boolean }) => props.$isLoading ? 'none' : 'scale(1.1)'};
   }
 
   &:disabled {
@@ -240,15 +236,6 @@ const RefreshButton = styled.button<{ $isLoading?: boolean }>`
 const Equals = styled.span`
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
-`;
-
-const shimmer = keyframes`
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
 `;
 
 const EditButton = styled.button`
@@ -317,19 +304,25 @@ const ModalButtons = styled.div`
   margin-top: 1.5rem;
 `;
 
-const ModalButton = styled.button<{ $primary?: boolean }>`
+interface ModalButtonProps {
+  $primary?: boolean;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  children?: React.ReactNode;
+}
+
+const ModalButton = styled.button<ModalButtonProps>`
   flex: 1;
   padding: 0.75rem;
   border-radius: 0.5rem;
   cursor: pointer;
   font-weight: 500;
-  background: ${props => props.$primary ? 'rgba(251, 255, 58, 0.1)' : 'rgba(255, 255, 255, 0.1)'};
-  border: 1px solid ${props => props.$primary ? '#FBFF3A' : 'rgba(255, 255, 255, 0.1)'};
-  color: ${props => props.$primary ? '#FBFF3A' : '#fff'};
+  background: ${(props: ModalButtonProps) => props.$primary ? 'rgba(251, 255, 58, 0.1)' : 'rgba(255, 255, 255, 0.1)'};
+  border: 1px solid ${(props: ModalButtonProps) => props.$primary ? '#FBFF3A' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${(props: ModalButtonProps) => props.$primary ? '#FBFF3A' : '#fff'};
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${props => props.$primary ? 'rgba(251, 255, 58, 0.15)' : 'rgba(255, 255, 255, 0.15)'};
+    background: ${(props: ModalButtonProps) => props.$primary ? 'rgba(251, 255, 58, 0.15)' : 'rgba(255, 255, 255, 0.15)'};
   }
 `;
 
@@ -365,7 +358,8 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
   const { airdropAmount, setAirdropAmount } = useAirdrop();
   const currencySymbol = fiatCurrency === 'USD' ? '$' : 'C$';
 
-  const handleRefresh = async () => {
+  const handleRefresh = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setIsRefreshing(true);
     await Promise.all([
       onRefresh(),
@@ -374,11 +368,13 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
     setIsRefreshing(false);
   };
 
-  const toggleCurrency = () => {
+  const toggleCurrency = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setCurrency(prev => prev === 'USDC' ? 'SOL' : 'USDC');
   };
 
-  const handleEditClick = () => {
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setInputValue(airdropAmount.toString());
     setShowModal(true);
   };
@@ -393,6 +389,19 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
 
   const handleSetDefault = () => {
     setInputValue(AIRDROP_AMOUNT.toString());
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^\d*\.?\d*$/.test(value)) {
+      setInputValue(value);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    }
   };
 
   if (loading) return <div>Loading prices...</div>;
@@ -450,7 +459,7 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
 
       {showModal && (
         <Modal onClick={() => setShowModal(false)}>
-          <ModalContent onClick={e => e.stopPropagation()}>
+          <ModalContent onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
             <h3>Edit Airdrop Amount</h3>
             <DefaultButton onClick={handleSetDefault}>
               Set Default (14,233.97 DBR)
@@ -458,7 +467,8 @@ export const ValueDisplay: React.FC<ValueDisplayProps> = ({ prices, loading, onR
             <Input
               type="number"
               value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               placeholder="Enter DBR amount"
               step="0.01"
               min="0"
