@@ -149,13 +149,20 @@ const ToggleButton = styled.button`
   background: rgba(251, 255, 58, 0.1);
   border: 1px solid rgba(251, 255, 58, 0.2);
   color: #FBFF3A;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 1rem;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s ease;
   backdrop-filter: blur(5px);
+  white-space: nowrap;
+  min-width: 120px;
+  
+  @media (min-width: 768px) {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
   
   &:hover {
     background: rgba(251, 255, 58, 0.15);
@@ -169,7 +176,9 @@ const ToggleButton = styled.button`
 `;
 
 const ButtonContainer = styled.div`
-  margin-top: 1rem;
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
   
   @media (min-width: 768px) {
     margin-top: 2.5rem;
