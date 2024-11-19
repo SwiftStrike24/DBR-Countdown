@@ -39,6 +39,7 @@ export const usePrices = () => {
       setPrices(transformedPrices);
       setLoading(false);
     } catch (err) {
+      console.error('Price fetch error:', err);
       setError('Failed to fetch prices');
       setLoading(false);
     }
