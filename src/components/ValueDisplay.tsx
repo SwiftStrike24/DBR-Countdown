@@ -160,9 +160,9 @@ const ToggleButton = styled.button`
   min-width: 120px;
   
   @media (max-width: 768px) {
-    color: #fff;
+    color: #000;
     border-color: rgba(251, 255, 58, 0.3);
-    background: rgba(251, 255, 58, 0.15);
+    background: rgba(251, 255, 58, 0.8);
     font-weight: 600;
   }
   
