@@ -159,9 +159,11 @@ const ToggleButton = styled.button`
   white-space: nowrap;
   min-width: 120px;
   
-  @media (min-width: 768px) {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+  @media (max-width: 768px) {
+    color: #fff;
+    border-color: rgba(251, 255, 58, 0.3);
+    background: rgba(251, 255, 58, 0.15);
+    font-weight: 600;
   }
   
   &:hover {
