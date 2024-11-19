@@ -94,6 +94,17 @@ const ChartHeader = styled.div`
 const ChartTitle = styled.div`
   color: #888;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const PriceChange = styled.span<{ isPositive: boolean }>`
+  color: ${props => props.isPositive ? '#4caf50' : '#ff4444'};
+  font-size: 0.9rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: ${props => props.isPositive ? 'rgba(76, 175, 80, 0.1)' : 'rgba(255, 68, 68, 0.1)'};
 `;
 
 const TimeframeButtons = styled.div`
@@ -197,6 +208,7 @@ export const PriceChart = () => {
   const [timeframe, setTimeframe] = useState<Timeframe>('7D');
   const [error, setError] = useState<string | null>(null);
   const [displayTicks, setDisplayTicks] = useState<number[]>([]);
+  const [priceChange, setPriceChange] = useState<number>(0);
 
   const fetchPriceHistory = async (selectedTimeframe: Timeframe) => {
     try {
@@ -230,6 +242,14 @@ export const PriceChart = () => {
         price,
         formattedDate: format(new Date(timestamp), formatString),
       }));
+
+      // Calculate price change percentage
+      if (formattedData.length >= 2) {
+        const startPrice = formattedData[0].price;
+        const endPrice = formattedData[formattedData.length - 1].price;
+        const changePercent = ((endPrice - startPrice) / startPrice) * 100;
+        setPriceChange(changePercent);
+      }
 
       const displayTicks = formattedData.filter((_, index) => {
         const totalPoints = formattedData.length;
@@ -265,7 +285,14 @@ export const PriceChart = () => {
   return (
     <ChartContainer>
       <ChartHeader>
-        <ChartTitle>DBR/USDC Price</ChartTitle>
+        <ChartTitle>
+          DBR/USDC Price
+          {!loading && !error && (
+            <PriceChange isPositive={priceChange >= 0}>
+              {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%
+            </PriceChange>
+          )}
+        </ChartTitle>
         <TimeframeButtons>
           {(['24H', '7D', '30D'] as Timeframe[]).map((tf) => (
             <TimeButton
