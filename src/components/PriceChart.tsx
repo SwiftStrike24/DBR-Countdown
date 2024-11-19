@@ -458,8 +458,9 @@ export const PriceChart: React.FC = () => {
                   fontSize: window.innerWidth <= 480 ? 10 : 12 
                 }}
                 tickFormatter={(value) => {
-                  const decimals = selectedToken === 'SOL' ? 2 : 3;
-                  const roundedValue = Number(value).toFixed(decimals);
+                  const roundedValue = selectedToken === 'SOL' ? 
+                    Math.round(value) : 
+                    Number(value).toFixed(3);
                   return `${currency === 'USD' ? '$' : 'C$'}${roundedValue}`;
                 }}
                 width={window.innerWidth <= 480 ? 60 : 70}

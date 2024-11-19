@@ -24,7 +24,6 @@
 - Recharts for interactive charts
 - Axios for API calls
 - CoinGecko API for crypto data
-- Exchange Rate API for fiat conversions
 - date-fns for date formatting
 
 ## 🎯 Core Components
@@ -45,7 +44,7 @@
   - Real-time price data
   - Historical price charts
   - Token metadata and logos
-- Exchange Rate API for USD/CAD conversion
+  - Multi-currency support (USD/CAD)
 - Auto-refresh mechanisms
   - Prices: Every 60 seconds
   - Chart data: Every 5 minutes
