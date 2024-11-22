@@ -104,7 +104,7 @@ const ChartContainer = styled.div`
   }
 `;
 
-const LoadingOverlay = styled.div<{ tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
+const LoadingOverlay = styled.div<{ tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.85);
@@ -121,7 +121,7 @@ const LoadingOverlay = styled.div<{ tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
   overflow: hidden;
 `;
 
-const LoadingSpinner = styled.div<{ tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
+const LoadingSpinner = styled.div<{ tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
   width: 60px;
   height: 60px;
   border: 4px solid ${props => `${TOKEN_COLORS[props.tokenType].main}1A`}; 
@@ -131,7 +131,7 @@ const LoadingSpinner = styled.div<{ tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
   box-shadow: 0 0 25px ${props => `${TOKEN_COLORS[props.tokenType].main}40`}; 
 `;
 
-const LoadingText = styled.div<{ tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
+const LoadingText = styled.div<{ tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
   margin-top: 20px;
   font-size: 16px;
   font-weight: 500;
@@ -214,6 +214,14 @@ const TOKEN_COLORS = {
     tooltip: '#9945FF',
     activeDot: 'rgba(153, 69, 255, 0.3)'
   },
+  BTC: {
+    main: '#F7931A',
+    background: 'rgba(247, 147, 26, 0.1)',
+    border: '#F7931A',
+    hover: 'rgba(247, 147, 26, 0.15)',
+    tooltip: '#F7931A',
+    activeDot: 'rgba(247, 147, 26, 0.3)'
+  },
   CADUSD: {
     main: '#DC143C',
     background: 'rgba(220, 20, 60, 0.1)',
@@ -224,7 +232,7 @@ const TOKEN_COLORS = {
   }
 };
 
-const TokenButton = styled.button<{ active: boolean; tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
+const TokenButton = styled.button<{ active: boolean; tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
   background: ${props => props.active ? TOKEN_COLORS[props.tokenType].background : 'rgba(255, 255, 255, 0.05)'};
   border: 1px solid ${props => props.active ? TOKEN_COLORS[props.tokenType].border : 'rgba(255, 255, 255, 0.1)'};
   border-radius: 50%;
@@ -325,7 +333,7 @@ const ErrorMessage = styled.div`
   padding: 1rem;
 `;
 
-const CustomTooltip: React.FC<CustomTooltipProps & { selectedToken: 'DBR' | 'SOL' | 'CADUSD' }> = ({ 
+const CustomTooltip: React.FC<CustomTooltipProps & { selectedToken: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }> = ({ 
   active, 
   payload, 
   label, 
@@ -388,7 +396,7 @@ const getTickCount = (timeframe: Timeframe, isMobile: boolean): number => {
 export const PriceChart: React.FC = () => {
   const { prices } = usePrices();
   const { currency } = useCurrency();
-  const [selectedToken, setSelectedToken] = useState<'DBR' | 'SOL' | 'CADUSD'>('DBR');
+  const [selectedToken, setSelectedToken] = useState<'DBR' | 'SOL' | 'BTC' | 'CADUSD'>('DBR');
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [timeframe, setTimeframe] = useState<Timeframe>('24H');
@@ -400,6 +408,7 @@ export const PriceChart: React.FC = () => {
 
   const dbrLogo = prices?.['debridge']?.['image'];
   const solLogo = prices?.['solana']?.['image']
+  const btcLogo = prices?.['bitcoin']?.['image']
 
   const fetchPriceHistory = async (selectedTimeframe: Timeframe) => {
     try {
@@ -469,7 +478,7 @@ export const PriceChart: React.FC = () => {
     }
   };
 
-  const handleTokenChange = (token: 'DBR' | 'SOL' | 'CADUSD') => {
+  const handleTokenChange = (token: 'DBR' | 'SOL' | 'BTC' | 'CADUSD') => {
     setSelectedToken(token);
     setChartLoaded(false);
     if (token === 'CADUSD') {
@@ -516,6 +525,14 @@ export const PriceChart: React.FC = () => {
           tokenType="SOL"
         >
           {solLogo && <img src={solLogo} alt="SOL" />}
+        </TokenButton>
+        <TokenButton
+          active={selectedToken === 'BTC'}
+          onClick={() => handleTokenChange('BTC')}
+          title="Switch to BTC/USDC"
+          tokenType="BTC"
+        >
+          {btcLogo && <img src={btcLogo} alt="BTC" />}
         </TokenButton>
         <TokenButton
           active={selectedToken === 'CADUSD'}
@@ -616,10 +633,15 @@ export const PriceChart: React.FC = () => {
                         fontSize: window.innerWidth <= 480 ? 10 : 12 
                       }}
                       tickFormatter={(value) => {
+                        const currencyPrefix = currency === 'USD' ? '$' : 'C$';
+                        // Format BTC with whole numbers, others with decimals
+                        if (selectedToken === 'BTC') {
+                          return `${currencyPrefix}${Math.round(value).toLocaleString()}`;
+                        }
                         const roundedValue = selectedToken === 'SOL' ? 
                           Math.round(value) : 
                           Number(value).toFixed(3);
-                        return `${currency === 'USD' ? '$' : 'C$'}${roundedValue}`;
+                        return `${currencyPrefix}${roundedValue}`;
                       }}
                       width={window.innerWidth <= 480 ? 60 : 70}
                       tickCount={5}

@@ -4,5 +4,6 @@ export const COINGECKO_API_KEY = import.meta.env.VITE_COINGECKO_API_KEY;
 export const TOKEN_IDS = {
   SOL: 'solana',
   DBR: 'debridge',
-  USDC: 'usd-coin'
+  USDC: 'usd-coin',
+  BTC: 'bitcoin'
 };
