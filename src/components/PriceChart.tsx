@@ -405,6 +405,7 @@ export const PriceChart: React.FC = () => {
   const [priceChange, setPriceChange] = useState<number>(0);
   const [tradingViewLoading, setTradingViewLoading] = useState(false);
   const [chartLoaded, setChartLoaded] = useState(false);
+  const [tradingViewKey, setTradingViewKey] = useState(0);
 
   const dbrLogo = prices?.['debridge']?.['image'];
   const solLogo = prices?.['solana']?.['image']
@@ -479,13 +480,19 @@ export const PriceChart: React.FC = () => {
   };
 
   const handleTokenChange = (token: 'DBR' | 'SOL' | 'BTC' | 'CADUSD') => {
-    setSelectedToken(token);
-    setChartLoaded(false);
-    if (token === 'CADUSD') {
+    if (token === 'CADUSD' && selectedToken === 'CADUSD') {
       setTradingViewLoading(true);
+      setChartLoaded(false);
+      setTradingViewKey(prev => prev + 1);
     } else {
-      setTradingViewLoading(false);
-      fetchPriceHistory('24H');
+      setSelectedToken(token);
+      setChartLoaded(false);
+      if (token === 'CADUSD') {
+        setTradingViewLoading(true);
+      } else {
+        setTradingViewLoading(false);
+        fetchPriceHistory('24H');
+      }
     }
   };
 
@@ -555,7 +562,10 @@ export const PriceChart: React.FC = () => {
                 <LoadingText tokenType="CADUSD">Loading CADUSD Chart...</LoadingText>
               </LoadingOverlay>
             )}
-            <TradingViewChart onLoadingChange={setTradingViewLoading} />
+            <TradingViewChart 
+              key={tradingViewKey} 
+              onLoadingChange={setTradingViewLoading} 
+            />
           </>
         ) : (
           <>

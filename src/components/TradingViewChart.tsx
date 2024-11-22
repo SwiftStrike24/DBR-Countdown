@@ -45,16 +45,28 @@ function TradingViewChart({ onLoadingChange }: { onLoadingChange?: (loading: boo
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    const cleanup = () => {
+      if (container.current) {
+        // Clean up existing TradingView widgets
+        const widgets = container.current.querySelectorAll('.tradingview-widget-container__widget');
+        widgets.forEach(widget => widget.remove());
+        
+        const scripts = container.current.querySelectorAll('script');
+        scripts.forEach(script => script.remove());
+      }
+    };
+
+    cleanup(); // Clean up before creating new widget
     if (!container.current) return;
     
     onLoadingChange?.(true);
+    setIsLoaded(false);
 
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
     script.type = "text/javascript";
     script.async = true;
     
-    // Add onload handler to detect when TradingView is ready
     script.onload = () => {
       setTimeout(() => {
         setIsLoaded(true);
@@ -63,7 +75,7 @@ function TradingViewChart({ onLoadingChange }: { onLoadingChange?: (loading: boo
           const widgetContainer = container.current.querySelector('.tradingview-widget-container');
           widgetContainer?.classList.add('loaded');
         }
-      }, 1000); // Give TradingView a second to render
+      }, 1250);
     };
 
     script.innerHTML = JSON.stringify({
@@ -86,14 +98,7 @@ function TradingViewChart({ onLoadingChange }: { onLoadingChange?: (loading: boo
 
     container.current.appendChild(script);
 
-    return () => {
-      if (container.current) {
-        const scriptElement = container.current.querySelector('script');
-        if (scriptElement) {
-          container.current.removeChild(scriptElement);
-        }
-      }
-    };
+    return cleanup;
   }, [onLoadingChange]);
 
   return (
