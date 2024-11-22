@@ -28,6 +28,30 @@ const fadeIn = keyframes`
   }
 `;
 
+const spin = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+
+const pulse = keyframes`
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+`;
+
 const ChartContainer = styled.div`
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
@@ -70,21 +94,41 @@ const ChartContainer = styled.div`
   }
 `;
 
-const LoadingOverlay = styled.div`
+const LoadingOverlay = styled.div<{ tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 1rem;
   z-index: 10;
   opacity: 0;
   animation: ${fadeIn} 0.3s ease-out forwards;
+  border-radius: inherit;
+  overflow: hidden;
+`;
+
+const LoadingSpinner = styled.div<{ tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
+  width: 60px;
+  height: 60px;
+  border: 4px solid ${props => `${TOKEN_COLORS[props.tokenType].main}1A`}; 
+  border-top: 4px solid ${props => TOKEN_COLORS[props.tokenType].main};
+  border-radius: 50%;
+  animation: ${spin} 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  box-shadow: 0 0 25px ${props => `${TOKEN_COLORS[props.tokenType].main}40`}; 
+`;
+
+const LoadingText = styled.div<{ tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: ${props => TOKEN_COLORS[props.tokenType].main};
+  text-shadow: 0 0 10px ${props => `${TOKEN_COLORS[props.tokenType].main}66`}; 
+  animation: ${pulse} 1.5s ease-in-out infinite;
+  letter-spacing: 0.5px;
 `;
 
 const ChartHeader = styled.div`
@@ -161,12 +205,12 @@ const TOKEN_COLORS = {
     activeDot: 'rgba(153, 69, 255, 0.3)'
   },
   CADUSD: {
-    main: '#FF0000',
-    background: 'rgba(255, 0, 0, 0.1)',
-    border: '#FF0000',
-    hover: 'rgba(255, 0, 0, 0.15)',
-    tooltip: '#FF0000',
-    activeDot: 'rgba(255, 0, 0, 0.3)'
+    main: '#DC143C',
+    background: 'rgba(220, 20, 60, 0.1)',
+    border: '#DC143C',
+    hover: 'rgba(220, 20, 60, 0.15)',
+    tooltip: '#DC143C',
+    activeDot: 'rgba(220, 20, 60, 0.3)'
   }
 };
 
@@ -317,7 +361,18 @@ const calculateDomain = (data: ChartDataPoint[]) => {
 };
 
 const getTickCount = (timeframe: Timeframe, isMobile: boolean): number => {
-  return isMobile ? 6 : 8;
+  if (isMobile) return 6;
+  
+  switch (timeframe) {
+    case '24H':
+      return 12;
+    case '7D':
+      return 8;
+    case '30D':
+      return 10;
+    default:
+      return 8;
+  }
 };
 
 export const PriceChart: React.FC = () => {
@@ -330,9 +385,10 @@ export const PriceChart: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [displayTicks, setDisplayTicks] = useState<number[]>([]);
   const [priceChange, setPriceChange] = useState<number>(0);
+  const [tradingViewLoading, setTradingViewLoading] = useState(false);
 
   const dbrLogo = prices?.['debridge']?.['image'];
-  const solLogo = prices?.['solana']?.['image'];
+  const solLogo = prices?.['solana']?.['image']
 
   const fetchPriceHistory = async (selectedTimeframe: Timeframe) => {
     try {
@@ -445,7 +501,15 @@ export const PriceChart: React.FC = () => {
       </TokenSelectorContainer>
       <ChartContainer>
         {selectedToken === 'CADUSD' ? (
-          <TradingViewChart />
+          <>
+            {tradingViewLoading && (
+              <LoadingOverlay tokenType="CADUSD">
+                <LoadingSpinner tokenType="CADUSD" />
+                <LoadingText tokenType="CADUSD">Loading CADUSD Chart...</LoadingText>
+              </LoadingOverlay>
+            )}
+            <TradingViewChart onLoadingChange={setTradingViewLoading} />
+          </>
         ) : (
           <>
             <ChartHeader>
@@ -469,7 +533,12 @@ export const PriceChart: React.FC = () => {
                 ))}
               </TimeframeButtons>
             </ChartHeader>
-            {loading && <LoadingOverlay>Loading price data...</LoadingOverlay>}
+            {loading && (
+              <LoadingOverlay tokenType={selectedToken}>
+                <LoadingSpinner tokenType={selectedToken} />
+                <LoadingText tokenType={selectedToken}>Loading {selectedToken} Chart...</LoadingText>
+              </LoadingOverlay>
+            )}
             {error && <ErrorMessage>{error}</ErrorMessage>}
             {!loading && !error && chartData.length > 0 && (
               <ResponsiveContainer width="100%" height={window.innerWidth <= 480 ? 200 : 300}>

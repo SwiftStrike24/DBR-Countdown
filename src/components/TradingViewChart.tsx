@@ -1,15 +1,22 @@
-import React, { useEffect, useRef, memo } from 'react';
+import React, { useEffect, useRef, memo, useState } from 'react';
 import styled from 'styled-components';
 
 const TradingViewContainer = styled.div`
   height: 100%;
   width: 100%;
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
+  border-radius: inherit;
   overflow: hidden;
+  position: relative;
 
   .tradingview-widget-container {
     height: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    
+    &.loaded {
+      opacity: 1;
+    }
   }
 
   .tradingview-widget-container__widget {
@@ -33,16 +40,32 @@ const TradingViewContainer = styled.div`
   }
 `;
 
-function TradingViewChart() {
+function TradingViewChart({ onLoadingChange }: { onLoadingChange?: (loading: boolean) => void }) {
   const container = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (!container.current) return;
+    
+    onLoadingChange?.(true);
 
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
     script.type = "text/javascript";
     script.async = true;
+    
+    // Add onload handler to detect when TradingView is ready
+    script.onload = () => {
+      setTimeout(() => {
+        setIsLoaded(true);
+        onLoadingChange?.(false);
+        if (container.current) {
+          const widgetContainer = container.current.querySelector('.tradingview-widget-container');
+          widgetContainer?.classList.add('loaded');
+        }
+      }, 1000); // Give TradingView a second to render
+    };
+
     script.innerHTML = JSON.stringify({
       autosize: true,
       symbol: "FX_IDC:CADUSD",
@@ -71,15 +94,15 @@ function TradingViewChart() {
         }
       }
     };
-  }, []);
+  }, [onLoadingChange]);
 
   return (
     <TradingViewContainer>
-      <div className="tradingview-widget-container" ref={container}>
+      <div className={`tradingview-widget-container${isLoaded ? ' loaded' : ''}`} ref={container}>
         <div className="tradingview-widget-container__widget"></div>
       </div>
     </TradingViewContainer>
   );
 }
 
-export default memo(TradingViewChart); 
+export default memo(TradingViewChart);
