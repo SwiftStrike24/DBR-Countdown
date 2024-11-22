@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, memo, useState } from 'react';
+import { useEffect, useRef, memo, useState } from 'react';
 import styled from 'styled-components';
 
 const TradingViewContainer = styled.div`
