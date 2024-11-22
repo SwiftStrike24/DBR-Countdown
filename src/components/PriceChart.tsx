@@ -14,6 +14,8 @@ import { format } from 'date-fns';
 import { TOKEN_IDS, COINGECKO_API_KEY } from '../config/constants';
 import { usePrices } from '../hooks/usePrices';
 import { useCurrency } from '../context/CurrencyContext';
+import TradingViewChart from './TradingViewChart';
+import MapleLeafIcon from '../assets/Maple_Leaf.svg';
 
 const fadeIn = keyframes`
   from {
@@ -157,10 +159,18 @@ const TOKEN_COLORS = {
     hover: 'rgba(153, 69, 255, 0.15)',
     tooltip: '#9945FF',
     activeDot: 'rgba(153, 69, 255, 0.3)'
+  },
+  CADUSD: {
+    main: '#FF0000',
+    background: 'rgba(255, 0, 0, 0.1)',
+    border: '#FF0000',
+    hover: 'rgba(255, 0, 0, 0.15)',
+    tooltip: '#FF0000',
+    activeDot: 'rgba(255, 0, 0, 0.3)'
   }
 };
 
-const TokenButton = styled.button<{ active: boolean; tokenType: 'DBR' | 'SOL' }>`
+const TokenButton = styled.button<{ active: boolean; tokenType: 'DBR' | 'SOL' | 'CADUSD' }>`
   background: ${props => props.active ? TOKEN_COLORS[props.tokenType].background : 'rgba(255, 255, 255, 0.05)'};
   border: 1px solid ${props => props.active ? TOKEN_COLORS[props.tokenType].border : 'rgba(255, 255, 255, 0.1)'};
   border-radius: 50%;
@@ -180,17 +190,32 @@ const TokenButton = styled.button<{ active: boolean; tokenType: 'DBR' | 'SOL' }>
   }
 
   img {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
+    width: ${props => props.tokenType === 'CADUSD' ? '18px' : '24px'};
+    height: ${props => props.tokenType === 'CADUSD' ? '18px' : '24px'};
+    border-radius: ${props => props.tokenType === 'CADUSD' ? '0' : '50%'};
+    object-fit: contain;
+    filter: ${props => props.tokenType === 'CADUSD' && !props.active 
+      ? 'brightness(0.7) opacity(0.8)' 
+      : props.tokenType === 'CADUSD' 
+        ? 'brightness(1) saturate(1.2)' 
+        : 'none'};
+    transition: all 0.2s ease;
+  }
+
+  &:hover img {
+    filter: ${props => props.tokenType === 'CADUSD' 
+      ? 'brightness(1) saturate(1.2)' 
+      : 'none'};
+    transform: scale(1.1);
   }
 
   @media (max-width: 480px) {
     width: 32px;
     height: 32px;
+    
     img {
-      width: 20px;
-      height: 20px;
+      width: ${props => props.tokenType === 'CADUSD' ? '14px' : '20px'};
+      height: ${props => props.tokenType === 'CADUSD' ? '14px' : '20px'};
     }
   }
 `;
@@ -223,7 +248,7 @@ interface CustomTooltipProps {
   currency: string;
 }
 
-const CustomTooltip: React.FC<CustomTooltipProps & { selectedToken: 'DBR' | 'SOL' }> = ({ 
+const CustomTooltip: React.FC<CustomTooltipProps & { selectedToken: 'DBR' | 'SOL' | 'CADUSD' }> = ({ 
   active, 
   payload, 
   label, 
@@ -282,7 +307,7 @@ const getTickCount = (timeframe: Timeframe, isMobile: boolean): number => {
 export const PriceChart: React.FC = () => {
   const { prices } = usePrices();
   const { currency } = useCurrency();
-  const [selectedToken, setSelectedToken] = useState<'DBR' | 'SOL'>('DBR');
+  const [selectedToken, setSelectedToken] = useState<'DBR' | 'SOL' | 'CADUSD'>('DBR');
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [timeframe, setTimeframe] = useState<Timeframe>('7D');
@@ -384,114 +409,131 @@ export const PriceChart: React.FC = () => {
         >
           {solLogo && <img src={solLogo} alt="SOL" />}
         </TokenButton>
+        <TokenButton
+          active={selectedToken === 'CADUSD'}
+          onClick={() => setSelectedToken('CADUSD')}
+          title="Switch to CAD/USD"
+          tokenType="CADUSD"
+        >
+          <img 
+            src={MapleLeafIcon}
+            alt="CAD/USD"
+          />
+        </TokenButton>
       </TokenSelectorContainer>
       <ChartContainer>
-        <ChartHeader>
-          <ChartTitle>
-            {selectedToken}/{currency} Price
-            {!loading && !error && (
-              <PriceChange isPositive={priceChange >= 0}>
-                {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%
-              </PriceChange>
+        {selectedToken === 'CADUSD' ? (
+          <TradingViewChart />
+        ) : (
+          <>
+            <ChartHeader>
+              <ChartTitle>
+                {selectedToken}/{currency} Price
+                {!loading && !error && (
+                  <PriceChange isPositive={priceChange >= 0}>
+                    {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%
+                  </PriceChange>
+                )}
+              </ChartTitle>
+              <TimeframeButtons>
+                {(['24H', '7D', '30D'] as Timeframe[]).map((tf) => (
+                  <TimeButton
+                    key={tf}
+                    active={timeframe === tf}
+                    onClick={() => handleTimeframeChange(tf)}
+                  >
+                    {tf}
+                  </TimeButton>
+                ))}
+              </TimeframeButtons>
+            </ChartHeader>
+            {loading && <LoadingOverlay>Loading price data...</LoadingOverlay>}
+            {error && (
+              <div style={{ color: '#ff4444', textAlign: 'center', padding: '1rem' }}>
+                {error}
+              </div>
             )}
-          </ChartTitle>
-          <TimeframeButtons>
-            {(['24H', '7D', '30D'] as Timeframe[]).map((tf) => (
-              <TimeButton
-                key={tf}
-                active={timeframe === tf}
-                onClick={() => handleTimeframeChange(tf)}
-              >
-                {tf}
-              </TimeButton>
-            ))}
-          </TimeframeButtons>
-        </ChartHeader>
-        {loading && <LoadingOverlay>Loading price data...</LoadingOverlay>}
-        {error && (
-          <div style={{ color: '#ff4444', textAlign: 'center', padding: '1rem' }}>
-            {error}
-          </div>
-        )}
-        {!loading && !error && chartData.length > 0 && (
-          <ResponsiveContainer width="100%" height={window.innerWidth <= 480 ? 200 : 300}>
-            <LineChart 
-              data={chartData} 
-              margin={{ 
-                top: 10, 
-                right: window.innerWidth <= 480 ? 15 : 25, 
-                left: window.innerWidth <= 480 ? 0 : 0, 
-                bottom: window.innerWidth <= 480 ? 10 : 5 
-              }}
-            >
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="rgba(255,255,255,0.1)" 
-                vertical={false}
-              />
-              <XAxis
-                dataKey="timestamp"
-                tickFormatter={(timestamp) => {
-                  const date = new Date(timestamp);
-                  if (timeframe === '24H') {
-                    return format(date, 'h:mm a');
-                  } else if (timeframe === '7D') {
-                    return format(date, 'MMM d');
-                  } else {
-                    return format(date, 'MMM d');
-                  }
-                }}
-                ticks={displayTicks}
-                tick={{ 
-                  fill: '#fff', 
-                  fontSize: window.innerWidth <= 480 ? 10 : 12,
-                  dy: window.innerWidth <= 480 ? 5 : 0
-                }}
-                height={window.innerWidth <= 480 ? 40 : 30}
-                axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-                tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-              />
-              <YAxis 
-                domain={calculateDomain(chartData)}
-                tick={{ 
-                  fill: '#fff', 
-                  fontSize: window.innerWidth <= 480 ? 10 : 12 
-                }}
-                tickFormatter={(value) => {
-                  const roundedValue = selectedToken === 'SOL' ? 
-                    Math.round(value) : 
-                    Number(value).toFixed(3);
-                  return `${currency === 'USD' ? '$' : 'C$'}${roundedValue}`;
-                }}
-                width={window.innerWidth <= 480 ? 60 : 70}
-                tickCount={5}
-                allowDecimals={true}
-                scale="linear"
-                axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-                tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-              />
-              <Tooltip 
-                content={<CustomTooltip currency={currency} selectedToken={selectedToken} />}
-                animationDuration={200}
-              />
-              <Line
-                type="monotone"
-                dataKey="price"
-                stroke={TOKEN_COLORS[selectedToken].main}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ 
-                  r: 6, 
-                  fill: TOKEN_COLORS[selectedToken].main,
-                  stroke: TOKEN_COLORS[selectedToken].activeDot,
-                  strokeWidth: 4
-                }}
-                animationDuration={1500}
-                animationBegin={300}
-                animationEasing="ease-out"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+            {!loading && !error && chartData.length > 0 && (
+              <ResponsiveContainer width="100%" height={window.innerWidth <= 480 ? 200 : 300}>
+                <LineChart 
+                  data={chartData} 
+                  margin={{ 
+                    top: 10, 
+                    right: window.innerWidth <= 480 ? 15 : 25, 
+                    left: window.innerWidth <= 480 ? 0 : 0, 
+                    bottom: window.innerWidth <= 480 ? 10 : 5 
+                  }}
+                >
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    stroke="rgba(255,255,255,0.1)" 
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="timestamp"
+                    tickFormatter={(timestamp) => {
+                      const date = new Date(timestamp);
+                      if (timeframe === '24H') {
+                        return format(date, 'h:mm a');
+                      } else if (timeframe === '7D') {
+                        return format(date, 'MMM d');
+                      } else {
+                        return format(date, 'MMM d');
+                      }
+                    }}
+                    ticks={displayTicks}
+                    tick={{ 
+                      fill: '#fff', 
+                      fontSize: window.innerWidth <= 480 ? 10 : 12,
+                      dy: window.innerWidth <= 480 ? 5 : 0
+                    }}
+                    height={window.innerWidth <= 480 ? 40 : 30}
+                    axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                    tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                  />
+                  <YAxis 
+                    domain={calculateDomain(chartData)}
+                    tick={{ 
+                      fill: '#fff', 
+                      fontSize: window.innerWidth <= 480 ? 10 : 12 
+                    }}
+                    tickFormatter={(value) => {
+                      const roundedValue = selectedToken === 'SOL' ? 
+                        Math.round(value) : 
+                        Number(value).toFixed(3);
+                      return `${currency === 'USD' ? '$' : 'C$'}${roundedValue}`;
+                    }}
+                    width={window.innerWidth <= 480 ? 60 : 70}
+                    tickCount={5}
+                    allowDecimals={true}
+                    scale="linear"
+                    axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                    tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                  />
+                  <Tooltip 
+                    content={<CustomTooltip currency={currency} selectedToken={selectedToken} />}
+                    animationDuration={200}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="price"
+                    stroke={TOKEN_COLORS[selectedToken].main}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ 
+                      r: 6, 
+                      fill: TOKEN_COLORS[selectedToken].main,
+                      stroke: TOKEN_COLORS[selectedToken].activeDot,
+                      strokeWidth: 4
+                    }}
+                    animationDuration={1500}
+                    animationBegin={300}
+                    animationEasing="ease-out"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </>
         )}
       </ChartContainer>
     </ChartWrapper>
