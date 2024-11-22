@@ -248,6 +248,29 @@ interface CustomTooltipProps {
   currency: string;
 }
 
+const TooltipContainer = styled.div`
+  background: rgba(0, 0, 0, 0.8);
+  padding: 8px;
+  border: 1px solid #444;
+  border-radius: 4px;
+`;
+
+const TooltipText = styled.p`
+  color: #fff;
+  margin: 0;
+`;
+
+const TooltipPrice = styled.p<{ color: string }>`
+  color: ${props => props.color};
+  margin: 4px 0 0 0;
+`;
+
+const ErrorMessage = styled.div`
+  color: #ff4444;
+  text-align: center;
+  padding: 1rem;
+`;
+
 const CustomTooltip: React.FC<CustomTooltipProps & { selectedToken: 'DBR' | 'SOL' | 'CADUSD' }> = ({ 
   active, 
   payload, 
@@ -258,21 +281,14 @@ const CustomTooltip: React.FC<CustomTooltipProps & { selectedToken: 'DBR' | 'SOL
   if (active && payload && payload.length) {
     const currencySymbol = currency === 'USD' ? '$' : 'C$';
     return (
-      <div
-        style={{
-          background: 'rgba(0, 0, 0, 0.8)',
-          padding: '8px',
-          border: '1px solid #444',
-          borderRadius: '4px',
-        }}
-      >
-        <p style={{ color: '#fff', margin: 0 }}>
+      <TooltipContainer>
+        <TooltipText>
           {label ? format(new Date(parseInt(label)), 'MMM d, yyyy h:mm a') : ''}
-        </p>
-        <p style={{ color: TOKEN_COLORS[selectedToken].tooltip, margin: '4px 0 0 0' }}>
+        </TooltipText>
+        <TooltipPrice color={TOKEN_COLORS[selectedToken].tooltip}>
           {currencySymbol}{payload[0].value.toFixed(4)}
-        </p>
-      </div>
+        </TooltipPrice>
+      </TooltipContainer>
     );
   }
   return null;
@@ -310,7 +326,7 @@ export const PriceChart: React.FC = () => {
   const [selectedToken, setSelectedToken] = useState<'DBR' | 'SOL' | 'CADUSD'>('DBR');
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [timeframe, setTimeframe] = useState<Timeframe>('7D');
+  const [timeframe, setTimeframe] = useState<Timeframe>('24H');
   const [error, setError] = useState<string | null>(null);
   const [displayTicks, setDisplayTicks] = useState<number[]>([]);
   const [priceChange, setPriceChange] = useState<number>(0);
@@ -326,8 +342,14 @@ export const PriceChart: React.FC = () => {
       
       console.log('Fetching with params:', params);
       
+      if (selectedToken === 'CADUSD') {
+        // Handle CAD/USD differently or return mock data
+        // This is just a placeholder - implement actual CAD/USD fetching logic
+        return;
+      }
+
       const response = await axios.get<PriceData>(
-        `https://api.coingecko.com/api/v3/coins/${TOKEN_IDS[selectedToken]}/market_chart`,
+        `https://api.coingecko.com/api/v3/coins/${TOKEN_IDS[selectedToken as keyof typeof TOKEN_IDS]}/market_chart`,
         {
           params: {
             vs_currency: currency.toLowerCase(),
@@ -448,11 +470,7 @@ export const PriceChart: React.FC = () => {
               </TimeframeButtons>
             </ChartHeader>
             {loading && <LoadingOverlay>Loading price data...</LoadingOverlay>}
-            {error && (
-              <div style={{ color: '#ff4444', textAlign: 'center', padding: '1rem' }}>
-                {error}
-              </div>
-            )}
+            {error && <ErrorMessage>{error}</ErrorMessage>}
             {!loading && !error && chartData.length > 0 && (
               <ResponsiveContainer width="100%" height={window.innerWidth <= 480 ? 200 : 300}>
                 <LineChart 
