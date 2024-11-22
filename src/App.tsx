@@ -8,6 +8,7 @@ import { usePrices } from './hooks/usePrices';
 import DbrLogo from './assets/dbr-animation.svg';
 import { CurrencyToggle } from './components/CurrencyToggle';
 import { AirdropProvider } from './context/AirdropContext';
+import { GitHubButton } from './components/GitHubButton';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -145,6 +146,16 @@ const Attribution = styled.a`
   }
 `;
 
+const LogoContainer = styled.div`
+  width: 100%;
+  text-align: center;
+`;
+
+const ValueDisplayContainer = styled.div`
+  flex: 1;
+  width: 100%;
+`;
+
 function AppContent() {
   const { prices, loading, refetch } = usePrices();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -157,19 +168,20 @@ function AppContent() {
 
   return (
     <AppContainer>
+      <GitHubButton />
       <CurrencyToggle />
       <ContentWrapper>
         <MainContent>
-          <div style={{ width: '100%', textAlign: 'center' }}>
+          <LogoContainer>
             <Logo src={DbrLogo} alt="DBR Token" />
             <Title>DBR Airdrop Tracker</Title>
             <Subtitle>Second Distribution Countdown</Subtitle>
-          </div>
+          </LogoContainer>
           <CountdownTimer />
           <AirdropProvider>
             <PriceSection>
               <PriceChart />
-              <div style={{ flex: 1, width: '100%' }}>
+              <ValueDisplayContainer>
                 <ValueDisplay 
                   prices={prices} 
                   loading={loading} 
@@ -180,7 +192,7 @@ function AppContent() {
                   loading={loading} 
                   isRefreshing={isRefreshing} 
                 />
-              </div>
+              </ValueDisplayContainer>
             </PriceSection>
           </AirdropProvider>
         </MainContent>
