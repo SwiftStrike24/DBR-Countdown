@@ -195,6 +195,79 @@ const TokenSelectorContainer = styled.div`
   gap: 0.5rem;
   margin-bottom: 0.75rem;
   align-items: center;
+  position: relative;
+
+  @media (max-width: 480px) {
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+    gap: 0.75rem;
+  }
+`;
+
+const TokenButtonsGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  @media (max-width: 480px) {
+    flex: 1;
+  }
+`;
+
+const LivePrice = styled.span<{ tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
+  color: ${props => TOKEN_COLORS[props.tokenType].main};
+  font-size: 1.1rem;
+  font-weight: 500;
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+`;
+
+const LivePriceContainer = styled.div`
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+
+  @media (max-width: 480px) {
+    padding: 3px 10px;
+    gap: 6px;
+  }
+`;
+
+const MobilePriceContainer = styled.div`
+  display: none;
+  
+  @media (max-width: 480px) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+`;
+
+const MobileLivePrice = styled(LivePrice)`
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+`;
+
+const DesktopLivePriceContainer = styled(LivePriceContainer)`
+  @media (max-width: 480px) {
+    display: none;
+  }
 `;
 
 const TOKEN_COLORS = {
@@ -393,36 +466,6 @@ const getTickCount = (timeframe: Timeframe, isMobile: boolean): number => {
   }
 };
 
-const LivePriceContainer = styled.div`
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  padding: 4px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 5;
-
-  @media (max-width: 480px) {
-    padding: 3px 10px;
-    gap: 6px;
-  }
-`;
-
-const LivePrice = styled.span<{ tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
-  color: ${props => TOKEN_COLORS[props.tokenType].main};
-  font-size: 1.1rem;
-  font-weight: 500;
-
-  @media (max-width: 480px) {
-    font-size: 0.9rem;
-  }
-`;
-
 const LivePriceIcon = styled.img`
   width: 20px;
   height: 20px;
@@ -558,45 +601,69 @@ export const PriceChart: React.FC = () => {
   return (
     <ChartWrapper>
       <TokenSelectorContainer>
-        <TokenButton
-          active={selectedToken === 'DBR'}
-          onClick={() => handleTokenChange('DBR')}
-          title="Switch to DBR/USDC"
-          tokenType="DBR"
-        >
-          {dbrLogo && <img src={dbrLogo} alt="DBR" />}
-        </TokenButton>
-        <TokenButton
-          active={selectedToken === 'SOL'}
-          onClick={() => handleTokenChange('SOL')}
-          title="Switch to SOL/USDC"
-          tokenType="SOL"
-        >
-          {solLogo && <img src={solLogo} alt="SOL" />}
-        </TokenButton>
-        <TokenButton
-          active={selectedToken === 'BTC'}
-          onClick={() => handleTokenChange('BTC')}
-          title="Switch to BTC/USDC"
-          tokenType="BTC"
-        >
-          {btcLogo && <img src={btcLogo} alt="BTC" />}
-        </TokenButton>
-        <TokenButton
-          active={selectedToken === 'CADUSD'}
-          onClick={() => handleTokenChange('CADUSD')}
-          title="Switch to CAD/USD"
-          tokenType="CADUSD"
-        >
-          <img 
-            src={MapleLeafIcon}
-            alt="CAD/USD"
-          />
-        </TokenButton>
+        <TokenButtonsGroup>
+          <TokenButton
+            active={selectedToken === 'DBR'}
+            onClick={() => handleTokenChange('DBR')}
+            title="Switch to DBR/USDC"
+            tokenType="DBR"
+          >
+            {dbrLogo && <img src={dbrLogo} alt="DBR" />}
+          </TokenButton>
+          <TokenButton
+            active={selectedToken === 'SOL'}
+            onClick={() => handleTokenChange('SOL')}
+            title="Switch to SOL/USDC"
+            tokenType="SOL"
+          >
+            {solLogo && <img src={solLogo} alt="SOL" />}
+          </TokenButton>
+          <TokenButton
+            active={selectedToken === 'BTC'}
+            onClick={() => handleTokenChange('BTC')}
+            title="Switch to BTC/USDC"
+            tokenType="BTC"
+          >
+            {btcLogo && <img src={btcLogo} alt="BTC" />}
+          </TokenButton>
+          <TokenButton
+            active={selectedToken === 'CADUSD'}
+            onClick={() => handleTokenChange('CADUSD')}
+            title="Switch to CAD/USD"
+            tokenType="CADUSD"
+          >
+            <img 
+              src={MapleLeafIcon}
+              alt="CAD/USD"
+            />
+          </TokenButton>
+        </TokenButtonsGroup>
+        {selectedToken !== 'CADUSD' && (
+          <MobilePriceContainer>
+            {selectedToken === 'DBR' && dbrLogo && (
+              <LivePriceIcon src={dbrLogo} alt="DBR" />
+            )}
+            {selectedToken === 'SOL' && solLogo && (
+              <LivePriceIcon src={solLogo} alt="SOL" />
+            )}
+            {selectedToken === 'BTC' && btcLogo && (
+              <LivePriceIcon src={btcLogo} alt="BTC" />
+            )}
+            <MobileLivePrice tokenType={selectedToken}>
+              {currency === 'USD' ? '$' : 'C$'}
+              {selectedToken === 'BTC' 
+                ? prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                : selectedToken === 'SOL'
+                  ? prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toFixed(2)
+                  : prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toFixed(6)
+              }
+            </MobileLivePrice>
+          </MobilePriceContainer>
+        )}
       </TokenSelectorContainer>
       <ChartContainer>
         {selectedToken !== 'CADUSD' && (
-          <LivePriceContainer>
+          <DesktopLivePriceContainer>
             {selectedToken === 'DBR' && dbrLogo && (
               <LivePriceIcon src={dbrLogo} alt="DBR" />
             )}
@@ -615,7 +682,7 @@ export const PriceChart: React.FC = () => {
                   : prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toFixed(6)
               }
             </LivePrice>
-          </LivePriceContainer>
+          </DesktopLivePriceContainer>
         )}
         {selectedToken === 'CADUSD' ? (
           <>
