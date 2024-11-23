@@ -393,6 +393,47 @@ const getTickCount = (timeframe: Timeframe, isMobile: boolean): number => {
   }
 };
 
+const LivePriceContainer = styled.div`
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+
+  @media (max-width: 480px) {
+    padding: 3px 10px;
+    gap: 6px;
+  }
+`;
+
+const LivePrice = styled.span<{ tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
+  color: ${props => TOKEN_COLORS[props.tokenType].main};
+  font-size: 1.1rem;
+  font-weight: 500;
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+`;
+
+const LivePriceIcon = styled.img`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+
+  @media (max-width: 480px) {
+    width: 16px;
+    height: 16px;
+  }
+`;
+
 export const PriceChart: React.FC = () => {
   const { prices } = usePrices();
   const { currency } = useCurrency();
@@ -554,6 +595,28 @@ export const PriceChart: React.FC = () => {
         </TokenButton>
       </TokenSelectorContainer>
       <ChartContainer>
+        {selectedToken !== 'CADUSD' && (
+          <LivePriceContainer>
+            {selectedToken === 'DBR' && dbrLogo && (
+              <LivePriceIcon src={dbrLogo} alt="DBR" />
+            )}
+            {selectedToken === 'SOL' && solLogo && (
+              <LivePriceIcon src={solLogo} alt="SOL" />
+            )}
+            {selectedToken === 'BTC' && btcLogo && (
+              <LivePriceIcon src={btcLogo} alt="BTC" />
+            )}
+            <LivePrice tokenType={selectedToken}>
+              {currency === 'USD' ? '$' : 'C$'}
+              {selectedToken === 'BTC' 
+                ? prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                : selectedToken === 'SOL'
+                  ? prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toFixed(2)
+                  : prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toFixed(6)
+              }
+            </LivePrice>
+          </LivePriceContainer>
+        )}
         {selectedToken === 'CADUSD' ? (
           <>
             {tradingViewLoading && (
