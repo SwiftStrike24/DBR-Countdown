@@ -196,27 +196,19 @@ const TokenSelectorContainer = styled.div`
   margin-bottom: 0.75rem;
   align-items: center;
   position: relative;
-
-  @media (max-width: 480px) {
-    flex-wrap: wrap;
-    margin-bottom: 0.5rem;
-    gap: 0.75rem;
-  }
+  flex-wrap: wrap;
+  justify-content: space-between;
 `;
 
 const TokenButtonsGroup = styled.div`
   display: flex;
   gap: 0.5rem;
   align-items: center;
-
-  @media (max-width: 480px) {
-    flex: 1;
-  }
 `;
 
 const LivePrice = styled.span<{ tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
   color: ${props => TOKEN_COLORS[props.tokenType].main};
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
 
   @media (max-width: 480px) {
@@ -224,49 +216,24 @@ const LivePrice = styled.span<{ tokenType: 'DBR' | 'SOL' | 'BTC' | 'CADUSD' }>`
   }
 `;
 
-const LivePriceContainer = styled.div`
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  padding: 4px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+const PriceDisplayContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  z-index: 5;
-
-  @media (max-width: 480px) {
-    padding: 3px 10px;
-    gap: 6px;
-  }
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
-const MobilePriceContainer = styled.div`
-  display: none;
-  
-  @media (max-width: 480px) {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 4px 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-`;
+const LivePriceIcon = styled.img`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
 
-const MobileLivePrice = styled(LivePrice)`
   @media (max-width: 480px) {
-    font-size: 0.9rem;
-  }
-`;
-
-const DesktopLivePriceContainer = styled(LivePriceContainer)`
-  @media (max-width: 480px) {
-    display: none;
+    width: 16px;
+    height: 16px;
   }
 `;
 
@@ -466,17 +433,6 @@ const getTickCount = (timeframe: Timeframe, isMobile: boolean): number => {
   }
 };
 
-const LivePriceIcon = styled.img`
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-
-  @media (max-width: 480px) {
-    width: 16px;
-    height: 16px;
-  }
-`;
-
 export const PriceChart: React.FC = () => {
   const { prices } = usePrices();
   const { currency } = useCurrency();
@@ -638,32 +594,9 @@ export const PriceChart: React.FC = () => {
             />
           </TokenButton>
         </TokenButtonsGroup>
+        
         {selectedToken !== 'CADUSD' && (
-          <MobilePriceContainer>
-            {selectedToken === 'DBR' && dbrLogo && (
-              <LivePriceIcon src={dbrLogo} alt="DBR" />
-            )}
-            {selectedToken === 'SOL' && solLogo && (
-              <LivePriceIcon src={solLogo} alt="SOL" />
-            )}
-            {selectedToken === 'BTC' && btcLogo && (
-              <LivePriceIcon src={btcLogo} alt="BTC" />
-            )}
-            <MobileLivePrice tokenType={selectedToken}>
-              {currency === 'USD' ? '$' : 'C$'}
-              {selectedToken === 'BTC' 
-                ? prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                : selectedToken === 'SOL'
-                  ? prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toFixed(2)
-                  : prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toFixed(6)
-              }
-            </MobileLivePrice>
-          </MobilePriceContainer>
-        )}
-      </TokenSelectorContainer>
-      <ChartContainer>
-        {selectedToken !== 'CADUSD' && (
-          <DesktopLivePriceContainer>
+          <PriceDisplayContainer>
             {selectedToken === 'DBR' && dbrLogo && (
               <LivePriceIcon src={dbrLogo} alt="DBR" />
             )}
@@ -682,8 +615,10 @@ export const PriceChart: React.FC = () => {
                   : prices?.[TOKEN_IDS[selectedToken]]?.['usd']?.toFixed(6)
               }
             </LivePrice>
-          </DesktopLivePriceContainer>
+          </PriceDisplayContainer>
         )}
+      </TokenSelectorContainer>
+      <ChartContainer>
         {selectedToken === 'CADUSD' ? (
           <>
             {tradingViewLoading && (
