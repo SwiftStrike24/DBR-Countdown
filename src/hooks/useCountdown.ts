@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { differenceInSeconds } from 'date-fns';
 import { TARGET_DATE } from '../config/constants';
 
 interface TimeLeft {
